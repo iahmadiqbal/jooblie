@@ -166,7 +166,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">
               Trusted by <span className="gradient-text-accent">Top Companies</span>
             </h2>
-            <p className="text-muted-foreground">Leading companies hire through JobVerse every day.</p>
+            <p className="text-muted-foreground">Leading companies hire through Jooblie every day.</p>
           </AnimatedSection>
 
           <AnimatedSection delay={0.2}>
