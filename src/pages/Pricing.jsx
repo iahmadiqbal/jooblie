@@ -37,13 +37,13 @@ const plans = [
 const Pricing = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
-    <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 relative overflow-hidden">
+    <section className="pt-28 sm:pt-32 md:pt-36 pb-12 sm:pb-16 md:pb-20 relative overflow-hidden">
       <div className="absolute w-60 sm:w-80 h-60 sm:h-80 bg-blue-500/20 rounded-full blur-3xl -top-20 left-1/4 animate-pulse" />
       <div className="absolute w-48 sm:w-64 h-48 sm:h-64 bg-orange-500/20 rounded-full blur-3xl bottom-0 right-1/4 animate-pulse" style={{ animationDelay: '1s' }} />
 
       <div className="container mx-auto px-4 relative z-10">
         <AnimatedSection className="text-center mb-10 sm:mb-12 md:mb-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-7 md:mb-8">
             Simple, <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Transparent</span> Pricing
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-4">Choose the plan that fits your needs. Upgrade or downgrade anytime.</p>
