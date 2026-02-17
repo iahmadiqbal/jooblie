@@ -3,7 +3,7 @@ import { Upload, File, Download, Trash2, Sparkles } from "lucide-react";
 
 const Resume = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <h1 className="text-3xl font-bold font-display mb-1 text-foreground">My Resume</h1>
+    <h1 className="text-3xl font-bold font-display mb-1 text-foreground mt-12 sm:mt-0">My Resume</h1>
     <p className="text-muted-foreground mb-8">Upload and manage your resume to apply for jobs faster.</p>
 
     <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
