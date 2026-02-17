@@ -194,7 +194,7 @@ const Index = () => {
                 Ready to Start Your <span className="gradient-text-hero">Journey</span>?
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                Join thousands of professionals who found their dream jobs through JobVerse.
+                Join thousands of professionals who found their dream jobs through Jooblie.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
