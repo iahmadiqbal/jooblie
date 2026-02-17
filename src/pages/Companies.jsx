@@ -19,7 +19,7 @@ const Companies = () => (
     <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
       <div className="container mx-auto px-4">
         <AnimatedSection className="text-center mb-10 sm:mb-12 md:mb-14">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-8">
             Top <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Companies</span> Hiring
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-4">Explore leading companies and discover amazing career opportunities.</p>
