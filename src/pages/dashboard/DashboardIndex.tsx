@@ -43,7 +43,7 @@ const DashboardIndex = () => (
   <div>
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <h1 className="text-3xl font-bold font-display mb-1 text-foreground">
-        Welcome back, John! 👋
+        Welcome back, Jooblie! 👋
       </h1>
       <p className="text-muted-foreground mb-8">
         Here's your job search overview.
