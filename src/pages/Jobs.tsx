@@ -17,49 +17,59 @@ const jobs = [
 const Jobs = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
-    <section className="pt-32 pb-20">
+    <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
       <div className="container mx-auto px-4">
-        <AnimatedSection className="mb-10">
-          <h1 className="text-4xl font-bold font-display mb-4">
-            Browse <span className="gradient-text">Jobs</span>
+        <AnimatedSection className="mb-6 sm:mb-8 md:mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10">
+            Browse <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Jobs</span>
           </h1>
-          {/* Search & Filter */}
-          <div className="glass-card p-2 flex flex-col sm:flex-row gap-2">
-            <div className="flex items-center gap-2 flex-1 px-4 py-2 rounded-lg bg-muted/50">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <input placeholder="Search jobs..." className="bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground w-full text-sm" />
+          
+          {/* Search & Filter - Fully Responsive */}
+          <div className="backdrop-blur-xl bg-card/50 border border-border rounded-xl p-2 flex flex-col gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex items-center gap-2 flex-1 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-muted/50">
+                <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <input placeholder="Search jobs..." className="bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground w-full text-sm" />
+              </div>
+              <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-muted/50 sm:w-auto">
+                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <input placeholder="Location" className="bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground w-full text-sm" />
+              </div>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50">
-              <MapPin className="w-4 h-4 text-muted-foreground" />
-              <input placeholder="Location" className="bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground w-full text-sm" />
-            </div>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-muted-foreground hover:text-foreground text-sm transition-colors">
+            <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-border text-muted-foreground hover:text-foreground text-sm transition-colors w-full sm:w-auto">
               <Filter className="w-4 h-4" /> Filters
             </button>
           </div>
         </AnimatedSection>
 
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {jobs.map((job, i) => (
             <AnimatedSection key={job.id} delay={i * 0.08}>
               <Link to={`/jobs/${job.id}`} className="block">
-                <div className="glow-card p-6 flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
-                    <Briefcase className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold font-display text-foreground">{job.title}</h3>
-                    <p className="text-sm text-muted-foreground">{job.company}</p>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {job.tags.map((tag) => (
-                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">{tag}</span>
-                      ))}
+                <div className="backdrop-blur-xl bg-card/50 border border-border rounded-xl p-4 sm:p-5 md:p-6 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    {/* Icon */}
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                      <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" />
                     </div>
-                  </div>
-                  <div className="flex flex-wrap md:flex-col gap-2 md:gap-1 text-sm text-muted-foreground md:text-right">
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
-                    <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{job.salary}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{job.posted}</span>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1 truncate">{job.title}</h3>
+                      <p className="text-sm text-muted-foreground mb-2">{job.company}</p>
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        {job.tags.map((tag) => (
+                          <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Meta Info */}
+                    <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-xs sm:text-sm text-muted-foreground sm:text-right flex-wrap sm:flex-nowrap">
+                      <span className="flex items-center gap-1 whitespace-nowrap"><MapPin className="w-3 h-3 flex-shrink-0" />{job.location}</span>
+                      <span className="flex items-center gap-1 whitespace-nowrap"><DollarSign className="w-3 h-3 flex-shrink-0" />{job.salary}</span>
+                      <span className="flex items-center gap-1 whitespace-nowrap"><Clock className="w-3 h-3 flex-shrink-0" />{job.posted}</span>
+                    </div>
                   </div>
                 </div>
               </Link>
