@@ -37,7 +37,7 @@ const plans = [
 const Pricing = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
-    <section className="pt-28 sm:pt-32 md:pt-36 pb-12 sm:pb-16 md:pb-20 relative overflow-hidden">
+    <section className="pt-28 sm:pt-32 md:pt-36 pb-16 sm:pb-20 md:pb-24 relative overflow-hidden">
       <div className="absolute w-60 sm:w-80 h-60 sm:h-80 bg-blue-500/20 rounded-full blur-3xl -top-20 left-1/4 animate-pulse" />
       <div className="absolute w-48 sm:w-64 h-48 sm:h-64 bg-orange-500/20 rounded-full blur-3xl bottom-0 right-1/4 animate-pulse" style={{ animationDelay: '1s' }} />
 

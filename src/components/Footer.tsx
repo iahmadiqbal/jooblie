@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Briefcase, Github, Twitter, Linkedin } from "lucide-react";
 
 const Footer = () => (
-  <footer className="border-t border-border bg-card/50">
+  <footer className="mt-12 sm:mt-16 md:mt-20 border-t border-border bg-card/50">
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
