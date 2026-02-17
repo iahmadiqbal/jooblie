@@ -34,7 +34,7 @@ const DashboardLayout = () => {
             </button>
           </div>
 
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          <nav className="flex-1 p-3 space-y-1 overflow-y-auto mt-4">
             {sidebarLinks.map((link) => (
               <NavLink
                 key={link.href}
@@ -76,7 +76,7 @@ const DashboardLayout = () => {
 
       {/* Main Content - No padding adjustment needed */}
       <main className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-0'} transition-all duration-300`}>
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className={`p-4 sm:p-6 md:p-8 ${!sidebarOpen ? 'pt-20 sm:pt-6 md:pt-8' : ''}`}>
           <Outlet />
         </div>
       </main>

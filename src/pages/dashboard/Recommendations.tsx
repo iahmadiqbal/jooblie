@@ -11,7 +11,7 @@ const recommendations = [
 
 const Recommendations = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <div className="flex items-center gap-2 mb-1">
+    <div className="flex items-center gap-2 mb-1 mt-12 sm:mt-0">
       <h1 className="text-3xl font-bold font-display text-foreground">AI Recommendations</h1>
       <Sparkles className="w-6 h-6 text-accent" />
     </div>
