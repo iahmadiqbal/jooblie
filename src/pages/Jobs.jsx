@@ -20,7 +20,7 @@ const Jobs = () => (
     <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
       <div className="container mx-auto px-4">
         <AnimatedSection className="mb-6 sm:mb-8 md:mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10">
             Browse <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Jobs</span>
           </h1>
           
