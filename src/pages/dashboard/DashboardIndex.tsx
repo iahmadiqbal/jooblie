@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Briefcase, FileText, Star, TrendingUp, Eye } from "lucide-react";
+import Chatbot from "@/components/Chatbot";
 
 const stats = [
   {
@@ -104,6 +105,7 @@ const DashboardIndex = () => (
         </div>
       </div>
     </motion.div>
+    <Chatbot context="dashboard" />
   </div>
 );
 

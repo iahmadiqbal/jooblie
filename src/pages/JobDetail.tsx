@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
+import Chatbot from "@/components/Chatbot";
 
 const jobData: Record<string, any> = {
   "1": {
@@ -192,6 +193,7 @@ const JobDetail = () => {
         </div>
       </section>
       <Footer />
+      <Chatbot context="job-detail" />
     </div>
   );
 };

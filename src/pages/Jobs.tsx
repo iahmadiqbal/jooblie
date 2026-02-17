@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
+import Chatbot from "@/components/Chatbot";
 
 const jobs = [
   { id: "1", title: "Senior React Developer", company: "TechCorp", location: "Remote", type: "Full-time", salary: "$120K - $160K", posted: "2 days ago", tags: ["React", "TypeScript", "Node.js"] },
@@ -79,6 +80,7 @@ const Jobs = () => (
       </div>
     </section>
     <Footer />
+    <Chatbot context="jobs" />
   </div>
 );
 
