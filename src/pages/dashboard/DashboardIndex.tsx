@@ -42,14 +42,13 @@ const recentApplications = [
 const DashboardIndex = () => (
   <div>
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <h1 className="text-3xl font-bold font-display mb-1 text-foreground">
-        Welcome back, Jooblie! 👋
-      </h1>
-      <p className="text-muted-foreground mb-8">
-        Here's your job search overview.
-      </p>
+      {/* Header - Properly centered on mobile */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-foreground text-center sm:text-left">Welcome back, Jooblie! 👋</h1>
+        <p className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">Here's your job search overview.</p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
