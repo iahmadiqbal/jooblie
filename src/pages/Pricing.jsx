@@ -43,7 +43,7 @@ const Pricing = () => (
 
       <div className="container mx-auto px-4 relative z-10">
         <AnimatedSection className="text-center mb-10 sm:mb-12 md:mb-16">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 sm:mb-8">
             Simple, <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Transparent</span> Pricing
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-4">Choose the plan that fits your needs. Upgrade or downgrade anytime.</p>
