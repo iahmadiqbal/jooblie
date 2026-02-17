@@ -1,0 +1,83 @@
+import { NavLink, Outlet } from "react-router-dom";
+import { LayoutDashboard, Briefcase, PlusCircle, Building2, LogOut, X, Menu } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+
+const sidebarLinks = [
+  { label: "Dashboard", href: "/recruiter/dashboard", icon: LayoutDashboard },
+  { label: "My Jobs", href: "/recruiter/jobs", icon: Briefcase },
+  { label: "Post a Job", href: "/recruiter/create-job", icon: PlusCircle },
+  { label: "Company", href: "/recruiter/company", icon: Building2 },
+];
+
+const RecruiterLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  return (
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      {sidebarOpen && (
+        <aside className="w-64 border-r border-border bg-card/50 flex flex-col fixed top-0 left-0 bottom-0 z-40">
+          <div className="p-4 border-b border-border flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center">
+                <Briefcase className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">Recruiter</span>
+            </Link>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+            {sidebarLinks.map((link) => (
+              <NavLink
+                key={link.href}
+                to={link.href}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isActive ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`
+                }
+              >
+                <link.icon className="w-4 h-4 flex-shrink-0" />
+                <span>{link.label}</span>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="p-3 border-t border-border">
+            <Link 
+              to="/" 
+              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Back to Site</span>
+            </Link>
+          </div>
+        </aside>
+      )}
+
+      {/* Menu Button - Shows when sidebar is closed */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors shadow-lg"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
+      {/* Main Content */}
+      <main className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-0'} p-4 sm:p-6 md:p-8 transition-all duration-300`}>
+        <Outlet />
+      </main>
+    </div>
+  );
+};
+
+export default RecruiterLayout;
