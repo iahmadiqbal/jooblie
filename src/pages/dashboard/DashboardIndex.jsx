@@ -19,7 +19,7 @@ const DashboardIndex = () => (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       {/* Header - Properly centered on mobile */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-foreground text-center sm:text-left">Welcome back, John! 👋</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-1 text-foreground text-center sm:text-left">Welcome back, Jooblie! 👋</h1>
         <p className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">Here's your job search overview.</p>
       </div>
 
