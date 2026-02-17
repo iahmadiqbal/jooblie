@@ -136,7 +136,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">
-              Why Choose <span className="gradient-text">JobVerse</span>?
+              Why Choose <span className="gradient-text">Jooblie</span>?
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               We combine cutting-edge AI with a beautiful experience to make your job search effortless.
