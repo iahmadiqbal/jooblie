@@ -25,7 +25,9 @@ const Navbar = () => {
           <div className="w-9 h-9 rounded-lg gradient-bg-primary flex items-center justify-center">
             <Briefcase className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold font-display gradient-text">JobVerse</span>
+          <span className="text-xl font-bold font-display gradient-text">
+            Jooblie
+          </span>
         </Link>
 
         {/* Desktop */}
@@ -35,7 +37,9 @@ const Navbar = () => {
               key={item.href}
               to={item.href}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                location.pathname === item.href ? "text-primary" : "text-muted-foreground"
+                location.pathname === item.href
+                  ? "text-primary"
+                  : "text-muted-foreground"
               }`}
             >
               {item.label}
@@ -59,7 +63,10 @@ const Navbar = () => {
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
+        <button
+          className="md:hidden text-foreground"
+          onClick={() => setOpen(!open)}
+        >
           {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
@@ -83,8 +90,20 @@ const Navbar = () => {
               </Link>
             ))}
             <div className="flex flex-col gap-2 pt-2 border-t border-border">
-              <Link to="/login" onClick={() => setOpen(false)} className="text-sm font-medium text-muted-foreground py-2">Login</Link>
-              <Link to="/register" onClick={() => setOpen(false)} className="text-sm font-medium gradient-bg-primary text-primary-foreground px-4 py-2 rounded-lg text-center">Get Started</Link>
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="text-sm font-medium text-muted-foreground py-2"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                onClick={() => setOpen(false)}
+                className="text-sm font-medium gradient-bg-primary text-primary-foreground px-4 py-2 rounded-lg text-center"
+              >
+                Get Started
+              </Link>
             </div>
           </div>
         </motion.div>
