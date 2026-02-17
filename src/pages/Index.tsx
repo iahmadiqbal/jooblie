@@ -70,7 +70,7 @@ const Index = () => {
               In Minutes
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Connect with top companies, get AI-powered job recommendations, and land your perfect role with JobVerse.
+              Connect with top companies, get AI-powered job recommendations, and land your perfect role with Jooblie.
             </p>
 
             {/* Search Bar */}
