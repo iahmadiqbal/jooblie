@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
+import { supabase } from "@/lib/supabase";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,10 +11,48 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"seeker" | "recruiter">("seeker");
 
-  const handleRegister = (e: React.FormEvent) => {
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement registration logic
-    navigate(role === "seeker" ? "/dashboard" : "/recruiter");
+
+    if (!fullName || !email || !password) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (role === "recruiter" && !companyName) {
+      alert("Company name is required for recruiters");
+      return;
+    }
+
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      setLoading(false);
+      alert(error.message);
+      return;
+    }
+
+    await supabase.from("profiles").insert({
+      id: data.user?.id,
+      role: role === "seeker" ? "job_seeker" : "recruiter",
+      full_name: fullName,
+      company_name: role === "recruiter" ? companyName : null,
+    });
+
+    setLoading(false);
+
+    navigate(role === "seeker" ? "/dashboard" : "/recruiter/dashboard");
   };
 
   return (
@@ -41,34 +80,7 @@ const Register = () => {
             </p>
           </div>
 
-          {/* Role toggle */}
-          <div className="flex gap-2 mb-6 p-1 rounded-lg bg-muted">
-            <button
-              type="button"
-              onClick={() => setRole("seeker")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                role === "seeker"
-                  ? "gradient-bg-primary text-primary-foreground"
-                  : "text-muted-foreground"
-              }`}
-            >
-              Job Seeker
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("recruiter")}
-              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
-                role === "recruiter"
-                  ? "gradient-bg-primary text-primary-foreground"
-                  : "text-muted-foreground"
-              }`}
-            >
-              Recruiter
-            </button>
-          </div>
-
           <form className="space-y-4" onSubmit={handleRegister}>
-            {/* Full Name */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Full Name
@@ -77,13 +89,14 @@ const Register = () => {
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="text"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
 
-            {/* Company Name (Recruiter Only) */}
             {role === "recruiter" && (
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
@@ -91,13 +104,14 @@ const Register = () => {
                 </label>
                 <input
                   type="text"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="Your Company"
                   className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Email
@@ -106,13 +120,14 @@ const Register = () => {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Password
@@ -121,38 +136,33 @@ const Register = () => {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
             <button
+              disabled={loading}
               type="submit"
               className="w-full gradient-bg-primary text-primary-foreground py-2.5 rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
             >
-              Create Account
+              {loading ? "Creating..." : "Create Account"}
             </button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-primary hover:underline font-medium"
-            >
+            <Link to="/login" className="text-primary hover:underline font-medium">
               Sign in
             </Link>
           </p>
