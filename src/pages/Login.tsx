@@ -25,7 +25,7 @@ const Login = () => {
               <Briefcase className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold font-display text-foreground">Welcome Back</h1>
-            <p className="text-muted-foreground text-sm mt-1">Sign in to your JobVerse account</p>
+            <p className="text-muted-foreground text-sm mt-1">Sign in to your Jooblie account</p>
           </div>
 
           <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
