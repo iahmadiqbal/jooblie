@@ -70,7 +70,7 @@ const Index = () => {
               In Minutes
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-              Connect with top companies, get AI-powered job recommendations, and land your perfect role with JobVerse.
+              Connect with top companies, get AI-powered job recommendations, and land your perfect role with Jooblie.
             </p>
 
             {/* Search Bar */}
@@ -136,7 +136,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <AnimatedSection className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">
-              Why Choose <span className="gradient-text">JobVerse</span>?
+              Why Choose <span className="gradient-text">Jooblie</span>?
             </h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               We combine cutting-edge AI with a beautiful experience to make your job search effortless.
@@ -166,7 +166,7 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">
               Trusted by <span className="gradient-text-accent">Top Companies</span>
             </h2>
-            <p className="text-muted-foreground">Leading companies hire through JobVerse every day.</p>
+            <p className="text-muted-foreground">Leading companies hire through Jooblie every day.</p>
           </AnimatedSection>
 
           <AnimatedSection delay={0.2}>
@@ -194,7 +194,7 @@ const Index = () => {
                 Ready to Start Your <span className="gradient-text-hero">Journey</span>?
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                Join thousands of professionals who found their dream jobs through JobVerse.
+                Join thousands of professionals who found their dream jobs through Jooblie.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

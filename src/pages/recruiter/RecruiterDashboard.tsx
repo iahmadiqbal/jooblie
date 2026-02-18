@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Briefcase, Users, Eye, TrendingUp } from "lucide-react";
+import Chatbot from "@/components/Chatbot";
 
 const stats = [
   { label: "Active Jobs", value: "8", icon: Briefcase, change: "+2 this month" },
@@ -54,6 +55,7 @@ const RecruiterDashboard = () => (
         ))}
       </div>
     </div>
+    <Chatbot context="recruiter" />
   </motion.div>
 );
 
