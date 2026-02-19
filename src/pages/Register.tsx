@@ -20,50 +20,68 @@
 //   const handleRegister = async (e: React.FormEvent) => {
 //     e.preventDefault();
 
-//     if (!fullName || !email || !password) {
+//     if (!fullName.trim() || !email.trim() || !password.trim()) {
 //       alert("Please fill all required fields");
 //       return;
 //     }
 
-//     if (role === "recruiter" && !companyName) {
+//     if (role === "recruiter" && !companyName.trim()) {
 //       alert("Company name is required for recruiters");
 //       return;
 //     }
 
-//     setLoading(true);
+//     try {
+//       setLoading(true);
 
-//     // Pass metadata so the DB trigger auto-creates the profile with correct values
-//     const { data, error: authError } = await supabase.auth.signUp({
-//       email,
-//       password,
-//       options: {
-//         data: {
-//           full_name: fullName,
-//           role: role,
-//           company_name: role === "recruiter" ? companyName : null,
+//       const { data, error } = await supabase.auth.signUp({
+//         email: email.trim(),
+//         password,
+//         options: {
+//           data: {
+//             full_name: fullName.trim(),
+//             role,
+//             company_name:
+//               role === "recruiter" ? companyName.trim() : null,
+//           },
 //         },
-//       },
-//     });
+//       });
 
-//     if (authError) {
-//       console.error("Auth error:", authError);
+//       if (error) {
+//         console.error("Signup error:", {
+//           message: error.message,
+//           status: error.status,
+//         });
+//         alert(error.message);
+//         return;
+//       }
+
+//       // If email confirmation is enabled, user session may not exist yet
+//       if (!data.user) {
+//         alert("Account created! Please confirm your email.");
+//         return;
+//       }
+
+//       // Optional: ensure session is established before redirect
+//       const { data: sessionData } = await supabase.auth.getSession();
+
+//       if (!sessionData.session) {
+//         alert("Account created! Please confirm your email before logging in.");
+//         return;
+//       }
+
+//       // Profile is created automatically by DB trigger (handle_new_user)
+
+//       navigate(
+//         role === "seeker"
+//           ? "/dashboard"
+//           : "/recruiter/dashboard"
+//       );
+//     } catch (err) {
+//       console.error("Unexpected registration error:", err);
+//       alert("Something went wrong. Please try again.");
+//     } finally {
 //       setLoading(false);
-//       alert(authError.message);
-//       return;
 //     }
-
-//     if (!data.user) {
-//       setLoading(false);
-//       alert("Account created! Please confirm your email before continuing.");
-//       return;
-//     }
-
-//     // Profile is created automatically by the DB trigger (handle_new_user).
-//     // No manual insert needed — doing so would cause a duplicate PK violation.
-
-//     setLoading(false);
-
-//     navigate(role === "seeker" ? "/dashboard" : "/recruiter/dashboard");
 //   };
 
 //   return (
@@ -116,6 +134,7 @@
 //               </button>
 //             </div>
 
+//             {/* Full Name */}
 //             <div>
 //               <label className="text-sm font-medium text-foreground mb-1.5 block">
 //                 Full Name
@@ -132,6 +151,7 @@
 //               </div>
 //             </div>
 
+//             {/* Company Name */}
 //             {role === "recruiter" && (
 //               <div>
 //                 <label className="text-sm font-medium text-foreground mb-1.5 block">
@@ -147,6 +167,7 @@
 //               </div>
 //             )}
 
+//             {/* Email */}
 //             <div>
 //               <label className="text-sm font-medium text-foreground mb-1.5 block">
 //                 Email
@@ -163,6 +184,7 @@
 //               </div>
 //             </div>
 
+//             {/* Password */}
 //             <div>
 //               <label className="text-sm font-medium text-foreground mb-1.5 block">
 //                 Password
@@ -181,7 +203,11 @@
 //                   onClick={() => setShowPassword(!showPassword)}
 //                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
 //                 >
-//                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+//                   {showPassword ? (
+//                     <EyeOff className="w-4 h-4" />
+//                   ) : (
+//                     <Eye className="w-4 h-4" />
+//                   )}
 //                 </button>
 //               </div>
 //             </div>
@@ -197,7 +223,10 @@
 
 //           <p className="text-center text-sm text-muted-foreground mt-6">
 //             Already have an account?{" "}
-//             <Link to="/login" className="text-primary hover:underline font-medium">
+//             <Link
+//               to="/login"
+//               className="text-primary hover:underline font-medium"
+//             >
 //               Sign in
 //             </Link>
 //           </p>
@@ -208,8 +237,6 @@
 // };
 
 // export default Register;
-
-
 
 
 
@@ -230,69 +257,72 @@ const Register = () => {
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (loading) return;
+
     if (!fullName.trim() || !email.trim() || !password.trim()) {
-      alert("Please fill all required fields");
+      alert("Please fill all required fields.");
       return;
     }
 
     if (role === "recruiter" && !companyName.trim()) {
-      alert("Company name is required for recruiters");
+      alert("Company name is required for recruiters.");
       return;
     }
 
+    setLoading(true);
+
     try {
-      setLoading(true);
+      const metadata = {
+        full_name: fullName.trim(),
+        role,
+        company_name:
+          role === "recruiter" ? companyName.trim() : null,
+      };
 
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
-          data: {
-            full_name: fullName.trim(),
-            role,
-            company_name:
-              role === "recruiter" ? companyName.trim() : null,
-          },
+          data: metadata,
         },
       });
 
       if (error) {
-        console.error("Signup error:", {
-          message: error.message,
-          status: error.status,
-        });
-        alert(error.message);
+        console.error("Signup error:", error);
+
+        if (error.message.toLowerCase().includes("rate limit")) {
+          alert("Too many signup attempts. Please wait a few minutes.");
+        } else if (error.message.toLowerCase().includes("already")) {
+          alert("An account with this email already exists.");
+        } else {
+          alert(error.message);
+        }
+
         return;
       }
 
-      // If email confirmation is enabled, user session may not exist yet
-      if (!data.user) {
-        alert("Account created! Please confirm your email.");
+      // If email confirmation is enabled, session will be null
+      if (!data.session) {
+        alert(
+          "Account created successfully! Please check your email to confirm your account before logging in."
+        );
         return;
       }
 
-      // Optional: ensure session is established before redirect
-      const { data: sessionData } = await supabase.auth.getSession();
-
-      if (!sessionData.session) {
-        alert("Account created! Please confirm your email before logging in.");
-        return;
-      }
-
-      // Profile is created automatically by DB trigger (handle_new_user)
-
+      // If confirmation is disabled, session exists immediately
       navigate(
-        role === "seeker"
-          ? "/dashboard"
-          : "/recruiter/dashboard"
+        role === "recruiter"
+          ? "/recruiter/dashboard"
+          : "/dashboard"
       );
     } catch (err) {
-      console.error("Unexpected registration error:", err);
+      console.error("Unexpected signup error:", err);
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -302,6 +332,7 @@ const Register = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
       <div className="relative pt-28 pb-20 flex items-center justify-center min-h-screen">
         <div className="floating-orb w-80 h-80 bg-secondary -top-10 -left-10 animate-pulse-glow" />
         <div className="floating-orb w-64 h-64 bg-accent bottom-10 -right-10 animate-pulse-glow" />
@@ -337,6 +368,7 @@ const Register = () => {
               >
                 Job Seeker
               </button>
+
               <button
                 type="button"
                 onClick={() => setRole("recruiter")}
@@ -366,7 +398,7 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Company Name */}
+            {/* Company Name (Recruiter Only) */}
             {role === "recruiter" && (
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
