@@ -32,23 +32,37 @@ const Register = () => {
 
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });
 
-    if (error) {
+    if (authError) {
+      console.error("Auth error:", authError);
       setLoading(false);
-      alert(error.message);
+      alert(authError.message);
       return;
     }
 
-    await supabase.from("profiles").insert({
-      id: data.user?.id,
-      role: role === "seeker" ? "job_seeker" : "recruiter",
+    if (!data.user) {
+      setLoading(false);
+      alert("Registration failed: no user returned. Please check if email confirmation is required.");
+      return;
+    }
+
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: data.user.id,
+      role: role === "seeker" ? "seeker" : "recruiter",
       full_name: fullName,
       company_name: role === "recruiter" ? companyName : null,
     });
+
+    if (profileError) {
+      console.error("Profile insert error:", profileError);
+      setLoading(false);
+      alert(profileError.message);
+      return;
+    }
 
     setLoading(false);
 
