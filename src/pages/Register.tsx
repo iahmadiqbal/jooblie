@@ -1,3 +1,218 @@
+// import { motion } from "framer-motion";
+// import { Link, useNavigate } from "react-router-dom";
+// import { Briefcase, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+// import { useState } from "react";
+// import Navbar from "@/components/Navbar";
+// import { supabase } from "@/lib/supabase";
+
+// const Register = () => {
+//   const navigate = useNavigate();
+
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [role, setRole] = useState<"seeker" | "recruiter">("seeker");
+
+//   const [fullName, setFullName] = useState("");
+//   const [companyName, setCompanyName] = useState("");
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [loading, setLoading] = useState(false);
+
+//   const handleRegister = async (e: React.FormEvent) => {
+//     e.preventDefault();
+
+//     if (!fullName || !email || !password) {
+//       alert("Please fill all required fields");
+//       return;
+//     }
+
+//     if (role === "recruiter" && !companyName) {
+//       alert("Company name is required for recruiters");
+//       return;
+//     }
+
+//     setLoading(true);
+
+//     // Pass metadata so the DB trigger auto-creates the profile with correct values
+//     const { data, error: authError } = await supabase.auth.signUp({
+//       email,
+//       password,
+//       options: {
+//         data: {
+//           full_name: fullName,
+//           role: role,
+//           company_name: role === "recruiter" ? companyName : null,
+//         },
+//       },
+//     });
+
+//     if (authError) {
+//       console.error("Auth error:", authError);
+//       setLoading(false);
+//       alert(authError.message);
+//       return;
+//     }
+
+//     if (!data.user) {
+//       setLoading(false);
+//       alert("Account created! Please confirm your email before continuing.");
+//       return;
+//     }
+
+//     // Profile is created automatically by the DB trigger (handle_new_user).
+//     // No manual insert needed — doing so would cause a duplicate PK violation.
+
+//     setLoading(false);
+
+//     navigate(role === "seeker" ? "/dashboard" : "/recruiter/dashboard");
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-background">
+//       <Navbar />
+//       <div className="relative pt-28 pb-20 flex items-center justify-center min-h-screen">
+//         <div className="floating-orb w-80 h-80 bg-secondary -top-10 -left-10 animate-pulse-glow" />
+//         <div className="floating-orb w-64 h-64 bg-accent bottom-10 -right-10 animate-pulse-glow" />
+
+//         <motion.div
+//           initial={{ opacity: 0, y: 30 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ duration: 0.6 }}
+//           className="glass-card p-8 md:p-10 w-full max-w-md mx-4 relative z-10"
+//         >
+//           <div className="text-center mb-8">
+//             <div className="w-12 h-12 rounded-xl gradient-bg-primary flex items-center justify-center mx-auto mb-4">
+//               <Briefcase className="w-6 h-6 text-primary-foreground" />
+//             </div>
+//             <h1 className="text-2xl font-bold font-display text-foreground">
+//               Create Account
+//             </h1>
+//             <p className="text-muted-foreground text-sm mt-1">
+//               Join Jooblie and start your journey
+//             </p>
+//           </div>
+
+//           <form className="space-y-4" onSubmit={handleRegister}>
+//             {/* Role Toggle */}
+//             <div className="flex rounded-lg bg-muted p-1 gap-1 mb-2">
+//               <button
+//                 type="button"
+//                 onClick={() => setRole("seeker")}
+//                 className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "seeker"
+//                   ? "gradient-bg-primary text-primary-foreground"
+//                   : "text-muted-foreground hover:text-foreground"
+//                   }`}
+//               >
+//                 Job Seeker
+//               </button>
+//               <button
+//                 type="button"
+//                 onClick={() => setRole("recruiter")}
+//                 className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "recruiter"
+//                   ? "gradient-bg-primary text-primary-foreground"
+//                   : "text-muted-foreground hover:text-foreground"
+//                   }`}
+//               >
+//                 Recruiter
+//               </button>
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium text-foreground mb-1.5 block">
+//                 Full Name
+//               </label>
+//               <div className="relative">
+//                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+//                 <input
+//                   type="text"
+//                   value={fullName}
+//                   onChange={(e) => setFullName(e.target.value)}
+//                   placeholder="John Doe"
+//                   className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+//                 />
+//               </div>
+//             </div>
+
+//             {role === "recruiter" && (
+//               <div>
+//                 <label className="text-sm font-medium text-foreground mb-1.5 block">
+//                   Company Name
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={companyName}
+//                   onChange={(e) => setCompanyName(e.target.value)}
+//                   placeholder="Your Company"
+//                   className="w-full px-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+//                 />
+//               </div>
+//             )}
+
+//             <div>
+//               <label className="text-sm font-medium text-foreground mb-1.5 block">
+//                 Email
+//               </label>
+//               <div className="relative">
+//                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+//                 <input
+//                   type="email"
+//                   value={email}
+//                   onChange={(e) => setEmail(e.target.value)}
+//                   placeholder="you@example.com"
+//                   className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+//                 />
+//               </div>
+//             </div>
+
+//             <div>
+//               <label className="text-sm font-medium text-foreground mb-1.5 block">
+//                 Password
+//               </label>
+//               <div className="relative">
+//                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+//                 <input
+//                   type={showPassword ? "text" : "password"}
+//                   value={password}
+//                   onChange={(e) => setPassword(e.target.value)}
+//                   placeholder="••••••••"
+//                   className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+//                 />
+//                 <button
+//                   type="button"
+//                   onClick={() => setShowPassword(!showPassword)}
+//                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+//                 >
+//                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+//                 </button>
+//               </div>
+//             </div>
+
+//             <button
+//               disabled={loading}
+//               type="submit"
+//               className="w-full gradient-bg-primary text-primary-foreground py-2.5 rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
+//             >
+//               {loading ? "Creating..." : "Create Account"}
+//             </button>
+//           </form>
+
+//           <p className="text-center text-sm text-muted-foreground mt-6">
+//             Already have an account?{" "}
+//             <Link to="/login" className="text-primary hover:underline font-medium">
+//               Sign in
+//             </Link>
+//           </p>
+//         </motion.div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Register;
+
+
+
+
+
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
@@ -20,53 +235,68 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password) {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
       alert("Please fill all required fields");
       return;
     }
 
-    if (role === "recruiter" && !companyName) {
+    if (role === "recruiter" && !companyName.trim()) {
       alert("Company name is required for recruiters");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            full_name: fullName.trim(),
+            role,
+            company_name:
+              role === "recruiter" ? companyName.trim() : null,
+          },
+        },
+      });
 
-    if (authError) {
-      console.error("Auth error:", authError);
+      if (error) {
+        console.error("Signup error:", {
+          message: error.message,
+          status: error.status,
+        });
+        alert(error.message);
+        return;
+      }
+
+      // If email confirmation is enabled, user session may not exist yet
+      if (!data.user) {
+        alert("Account created! Please confirm your email.");
+        return;
+      }
+
+      // Optional: ensure session is established before redirect
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (!sessionData.session) {
+        alert("Account created! Please confirm your email before logging in.");
+        return;
+      }
+
+      // Profile is created automatically by DB trigger (handle_new_user)
+
+      navigate(
+        role === "seeker"
+          ? "/dashboard"
+          : "/recruiter/dashboard"
+      );
+    } catch (err) {
+      console.error("Unexpected registration error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      alert(authError.message);
-      return;
     }
-
-    if (!data.user) {
-      setLoading(false);
-      alert("Registration failed: no user returned. Please check if email confirmation is required.");
-      return;
-    }
-
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: data.user.id,
-      role: role === "seeker" ? "seeker" : "recruiter",
-      full_name: fullName,
-      company_name: role === "recruiter" ? companyName : null,
-    });
-
-    if (profileError) {
-      console.error("Profile insert error:", profileError);
-      setLoading(false);
-      alert(profileError.message);
-      return;
-    }
-
-    setLoading(false);
-
-    navigate(role === "seeker" ? "/dashboard" : "/recruiter/dashboard");
   };
 
   return (
@@ -95,6 +325,31 @@ const Register = () => {
           </div>
 
           <form className="space-y-4" onSubmit={handleRegister}>
+            {/* Role Toggle */}
+            <div className="flex rounded-lg bg-muted p-1 gap-1 mb-2">
+              <button
+                type="button"
+                onClick={() => setRole("seeker")}
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "seeker"
+                    ? "gradient-bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                Job Seeker
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("recruiter")}
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "recruiter"
+                    ? "gradient-bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                Recruiter
+              </button>
+            </div>
+
+            {/* Full Name */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Full Name
@@ -111,6 +366,7 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Company Name */}
             {role === "recruiter" && (
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
@@ -126,6 +382,7 @@ const Register = () => {
               </div>
             )}
 
+            {/* Email */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Email
@@ -142,6 +399,7 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Password */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Password
@@ -160,7 +418,11 @@ const Register = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -176,7 +438,10 @@ const Register = () => {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline font-medium">
+            <Link
+              to="/login"
+              className="text-primary hover:underline font-medium"
+            >
               Sign in
             </Link>
           </p>
