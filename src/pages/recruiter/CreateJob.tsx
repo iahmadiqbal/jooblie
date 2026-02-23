@@ -3,10 +3,12 @@ import { Briefcase, MapPin, DollarSign, Clock, FileText, Save } from "lucide-rea
 
 const CreateJob = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <h1 className="text-3xl font-bold font-display mb-1 text-foreground">Post a New Job</h1>
-    <p className="text-muted-foreground mb-8">Create a compelling job listing to attract top talent.</p>
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold font-display mb-1 text-foreground">Post a New Job</h1>
+      <p className="text-muted-foreground mb-8">Create a compelling job listing to attract top talent.</p>
+    </div>
 
-    <div className="glass-card p-8 max-w-3xl">
+    <div className="glass-card p-8 max-w-3xl mx-auto">
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label className="text-sm font-medium text-foreground mb-1.5 block">Job Title</label>

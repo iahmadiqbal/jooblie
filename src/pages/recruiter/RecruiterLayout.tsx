@@ -75,7 +75,7 @@ const RecruiterLayout = () => {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 z-50 p-2.5 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors shadow-lg"
+          className="fixed top-4 left-4 z-[60] p-2.5 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors shadow-lg md:shadow-md"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -84,7 +84,9 @@ const RecruiterLayout = () => {
       {/* Main Content */}
       <main className={`flex-1 min-h-screen ${sidebarOpen ? 'md:ml-64' : 'ml-0'} transition-all duration-300`}>
         <div className={`p-4 sm:p-6 md:p-8 min-h-screen ${!sidebarOpen ? 'pt-20 md:pt-8' : 'pt-4 md:pt-8'}`}>
-          <Outlet />
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
