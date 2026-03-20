@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Briefcase, Github, Twitter, Linkedin } from "lucide-react";
+import { Briefcase } from "lucide-react";
 
 const Footer = () => (
   <footer className="mt-12 sm:mt-16 md:mt-20 border-t border-border bg-card/50">
@@ -78,19 +78,9 @@ const Footer = () => (
               href="#"
               className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
             >
-              <Twitter className="w-4 h-4" />
-            </a>
-            <a
-              href="#"
-              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
-            >
-              <Linkedin className="w-4 h-4" />
-            </a>
-            <a
-              href="#"
-              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
-            >
-              <Github className="w-4 h-4" />
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
             </a>
           </div>
         </div>
