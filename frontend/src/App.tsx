@@ -1,8 +1,9 @@
-import { Toaster as Sonner } from "@/components/ui/sonner"; // ✅ only one toast
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -32,43 +33,44 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        {/* ✅ ONLY ONE TOAST */}
-        <Sonner position="top-right" richColors />
+      <AuthProvider>
+        <TooltipProvider>
+          <Sonner position="top-right" richColors />
 
-        <BrowserRouter
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/:id" element={<JobDetail />} />
+          <BrowserRouter
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+          >
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/jobs/:id" element={<JobDetail />} />
 
-            {/* Job Seeker Dashboard */}
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<DashboardIndex />} />
-              <Route path="applications" element={<Applications />} />
-              <Route path="recommendations" element={<Recommendations />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="resume" element={<Resume />} />
-            </Route>
+              {/* Job Seeker Dashboard */}
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route index element={<DashboardIndex />} />
+                <Route path="applications" element={<Applications />} />
+                <Route path="recommendations" element={<Recommendations />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="resume" element={<Resume />} />
+              </Route>
 
-            {/* Recruiter Dashboard */}
-            <Route path="/recruiter" element={<RecruiterLayout />}>
-              <Route path="dashboard" element={<RecruiterDashboard />} />
-              <Route path="jobs" element={<RecruiterJobs />} />
-              <Route path="create-job" element={<CreateJob />} />
-              <Route path="company" element={<CompanyPage />} />
-            </Route>
+              {/* Recruiter Dashboard */}
+              <Route path="/recruiter" element={<RecruiterLayout />}>
+                <Route path="dashboard" element={<RecruiterDashboard />} />
+                <Route path="jobs" element={<RecruiterJobs />} />
+                <Route path="create-job" element={<CreateJob />} />
+                <Route path="company" element={<CompanyPage />} />
+              </Route>
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
