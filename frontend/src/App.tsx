@@ -27,6 +27,8 @@ import CreateJob from "./pages/recruiter/CreateJob";
 import CompanyPage from "./pages/recruiter/CompanyPage";
 
 import NotFound from "./pages/NotFound";
+import { Toaster } from "react-hot-toast";
+import SavedJobs from "./pages/dashboard/SavedJobs";
 
 const queryClient = new QueryClient();
 
@@ -34,29 +36,31 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
-        <TooltipProvider>
-          <Sonner position="top-right" richColors />
+      <TooltipProvider>
+        {/* ✅ ONLY ONE TOAST */}
+        <Sonner position="top-right" richColors />
+<Toaster/>
+        <BrowserRouter
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/companies" element={<Companies />} />
+            <Route path="/jobs" element={<Jobs />} />
+            <Route path="/jobs/:id" element={<JobDetail />} />
 
-          <BrowserRouter
-            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-          >
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/companies" element={<Companies />} />
-              <Route path="/jobs" element={<Jobs />} />
-              <Route path="/jobs/:id" element={<JobDetail />} />
-
-              {/* Job Seeker Dashboard */}
-              <Route path="/dashboard" element={<DashboardLayout />}>
-                <Route index element={<DashboardIndex />} />
-                <Route path="applications" element={<Applications />} />
-                <Route path="recommendations" element={<Recommendations />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="resume" element={<Resume />} />
-              </Route>
+            {/* Job Seeker Dashboard */}
+            <Route path="/dashboard" element={<DashboardLayout />}>
+              <Route index element={<DashboardIndex />} />
+              <Route path="applications" element={<Applications />} />
+              <Route path="saved" element={<SavedJobs />} />
+              <Route path="recommendations" element={<Recommendations />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="resume" element={<Resume />} />
+            </Route>
 
               {/* Recruiter Dashboard */}
               <Route path="/recruiter" element={<RecruiterLayout />}>
