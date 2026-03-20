@@ -26,6 +26,8 @@ import CreateJob from "./pages/recruiter/CreateJob";
 import CompanyPage from "./pages/recruiter/CompanyPage";
 
 import NotFound from "./pages/NotFound";
+import { Toaster } from "react-hot-toast";
+import SavedJobs from "./pages/dashboard/SavedJobs";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +37,7 @@ const App = () => (
       <TooltipProvider>
         {/* ✅ ONLY ONE TOAST */}
         <Sonner position="top-right" richColors />
-
+<Toaster/>
         <BrowserRouter
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
         >
@@ -52,6 +54,7 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardIndex />} />
               <Route path="applications" element={<Applications />} />
+              <Route path="saved" element={<SavedJobs />} />
               <Route path="recommendations" element={<Recommendations />} />
               <Route path="profile" element={<Profile />} />
               <Route path="resume" element={<Resume />} />

@@ -1,26 +1,83 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import { Search, MapPin, Briefcase, Clock, DollarSign, Filter } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
 import Chatbot from "@/components/Chatbot";
+import { supabase } from "@/lib/supabase";
 
-const jobs = [
-  { id: "1", title: "Senior React Developer", company: "TechCorp", location: "Remote", type: "Full-time", salary: "$120K - $160K", posted: "2 days ago", tags: ["React", "TypeScript", "Node.js"] },
-  { id: "2", title: "Product Designer", company: "DesignHub", location: "New York, NY", type: "Full-time", salary: "$100K - $140K", posted: "1 day ago", tags: ["Figma", "UI/UX", "Prototyping"] },
-  { id: "3", title: "Data Scientist", company: "DataFlow", location: "Austin, TX", type: "Full-time", salary: "$130K - $170K", posted: "3 days ago", tags: ["Python", "ML", "SQL"] },
-  { id: "4", title: "DevOps Engineer", company: "CloudNine", location: "Remote", type: "Full-time", salary: "$110K - $150K", posted: "5 hours ago", tags: ["AWS", "Docker", "Kubernetes"] },
-  { id: "5", title: "Marketing Manager", company: "GreenTech", location: "Denver, CO", type: "Full-time", salary: "$90K - $120K", posted: "1 week ago", tags: ["SEO", "Content", "Analytics"] },
-  { id: "6", title: "Backend Engineer", company: "FinanceAI", location: "Chicago, IL", type: "Full-time", salary: "$125K - $165K", posted: "4 days ago", tags: ["Go", "PostgreSQL", "gRPC"] },
-];
+interface Job {
+  id: string;
+  title: string;
+  company_name: string | null;
+  location: string | null;
+  job_type: string | null;
+  salary_min: string | null;
+  salary_max: string | null;
+  salary_currency: string | null;
+  created_at: string | null;
+  skills: string[] | null;
+  status: string | null;
+}
+
+const formatPostedDate = (dateString: string | null) => {
+  if (!dateString) return "Recently";
+  const now = new Date();
+  const posted = new Date(dateString);
+  const diffMs = now.getTime() - posted.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 1) return "Just now";
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+  return posted.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+
+const formatSalary = (job: Job) => {
+  const currency = job.salary_currency || "$";
+  if (job.salary_min && job.salary_max) {
+    return `${currency}${job.salary_min} - ${currency}${job.salary_max}`;
+  }
+  if (job.salary_min) return `${currency}${job.salary_min}`;
+  if (job.salary_max) return `${currency}${job.salary_max}`;
+  return "Not specified";
+};
 
 const Jobs = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const keyword = searchParams.get("q") || "";
   const location = searchParams.get("location") || "";
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("jobs")
+        .select(
+          "id, title, company_name, location, job_type, salary_min, salary_max, salary_currency, created_at, skills, status"
+        )
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Fetch jobs error:", error);
+        setJobs([]);
+        setLoading(false);
+        return;
+      }
+
+      setJobs(data || []);
+      setLoading(false);
+    };
+
+    fetchJobs();
+  }, []);
 
   const filteredJobs = useMemo(() => {
     return jobs.filter((job) => {
@@ -29,16 +86,16 @@ const Jobs = () => {
 
       const matchesKeyword =
         !q ||
-        job.title.toLowerCase().includes(q) ||
-        job.company.toLowerCase().includes(q) ||
-        job.tags.some((tag) => tag.toLowerCase().includes(q));
+        job.title?.toLowerCase().includes(q) ||
+        job.company_name?.toLowerCase().includes(q) ||
+        job.skills?.some((tag) => tag.toLowerCase().includes(q));
 
       const matchesLocation =
-        !loc || job.location.toLowerCase().includes(loc);
+        !loc || job.location?.toLowerCase().includes(loc);
 
       return matchesKeyword && matchesLocation;
     });
-  }, [keyword, location]);
+  }, [jobs, keyword, location]);
 
   const handleKeywordChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -63,11 +120,15 @@ const Jobs = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
       <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20">
         <div className="container mx-auto px-4">
           <AnimatedSection className="mb-6 sm:mb-8 md:mb-10">
             <h1 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-10">
-              Browse <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">Jobs</span>
+              Browse{" "}
+              <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                Jobs
+              </span>
             </h1>
 
             <div className="backdrop-blur-xl bg-card/50 border border-border rounded-xl p-2 flex flex-col gap-2">
@@ -98,7 +159,7 @@ const Jobs = () => {
               </button>
             </div>
 
-            {(keyword || location) && (
+            {(keyword || location) && !loading && (
               <p className="text-sm text-muted-foreground mt-4">
                 {filteredJobs.length > 0
                   ? `Showing ${filteredJobs.length} result${filteredJobs.length > 1 ? "s" : ""}`
@@ -107,7 +168,14 @@ const Jobs = () => {
             )}
           </AnimatedSection>
 
-          {filteredJobs.length > 0 ? (
+          {loading ? (
+            <AnimatedSection>
+              <div className="backdrop-blur-xl bg-card/50 border border-border rounded-xl p-8 text-center">
+                <h2 className="text-xl font-semibold text-foreground mb-2">Loading jobs...</h2>
+                <p className="text-muted-foreground">Please wait a moment.</p>
+              </div>
+            </AnimatedSection>
+          ) : filteredJobs.length > 0 ? (
             <div className="space-y-3 sm:space-y-4">
               {filteredJobs.map((job, i) => (
                 <AnimatedSection key={job.id} delay={i * 0.08}>
@@ -122,9 +190,12 @@ const Jobs = () => {
                           <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1 truncate">
                             {job.title}
                           </h3>
-                          <p className="text-sm text-muted-foreground mb-2">{job.company}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {job.company_name || "Unknown Company"}
+                          </p>
+
                           <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                            {job.tags.map((tag) => (
+                            {(job.skills || []).map((tag) => (
                               <span
                                 key={tag}
                                 className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400"
@@ -138,15 +209,15 @@ const Jobs = () => {
                         <div className="flex flex-row sm:flex-col gap-2 sm:gap-1 text-xs sm:text-sm text-muted-foreground sm:text-right flex-wrap sm:flex-nowrap">
                           <span className="flex items-center gap-1 whitespace-nowrap">
                             <MapPin className="w-3 h-3 flex-shrink-0" />
-                            {job.location}
+                            {job.location || "Not specified"}
                           </span>
                           <span className="flex items-center gap-1 whitespace-nowrap">
                             <DollarSign className="w-3 h-3 flex-shrink-0" />
-                            {job.salary}
+                            {formatSalary(job)}
                           </span>
                           <span className="flex items-center gap-1 whitespace-nowrap">
                             <Clock className="w-3 h-3 flex-shrink-0" />
-                            {job.posted}
+                            {formatPostedDate(job.created_at)}
                           </span>
                         </div>
                       </div>
@@ -167,6 +238,7 @@ const Jobs = () => {
           )}
         </div>
       </section>
+
       <Footer />
       <Chatbot context="jobs" />
     </div>
