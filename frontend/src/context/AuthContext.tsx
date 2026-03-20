@@ -18,29 +18,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchRole = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-    setRole(data?.role ?? null);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .single();
+      if (error) {
+        console.error("fetchRole error:", error.message);
+        setRole(null);
+      } else {
+        setRole(data?.role ?? null);
+      }
+    } catch {
+      setRole(null);
+    }
   };
 
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) {
-        await fetchRole(data.session.user.id);
-      }
-      setLoading(false);
-    };
-
-    getSession();
+    let mounted = true;
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -48,10 +48,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           setRole(null);
         }
+        setLoading(false);
       }
     );
 
+    // Handle case where onAuthStateChange doesn't fire (no session)
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return;
+      if (!data.session) {
+        setLoading(false);
+      }
+    });
+
+    // Safety fallback — agar kuch bhi fire na ho
+    const timeout = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 5000);
+
     return () => {
+      mounted = false;
+      clearTimeout(timeout);
       listener.subscription.unsubscribe();
     };
   }, []);

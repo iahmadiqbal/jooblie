@@ -28,7 +28,7 @@ const RecruiterLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && role !== "recruiter") {
+  if (role === "job_seeker") {
     return <Navigate to="/dashboard" replace />;
   }
 

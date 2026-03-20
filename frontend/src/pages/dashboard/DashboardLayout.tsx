@@ -29,7 +29,7 @@ const DashboardLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && role !== "job_seeker") {
+  if (role === "recruiter") {
     return <Navigate to="/recruiter/dashboard" replace />;
   }
 
