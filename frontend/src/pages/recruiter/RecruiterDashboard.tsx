@@ -17,8 +17,8 @@ const recentApplicants = [
 
 const RecruiterDashboard = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <h1 className="text-3xl font-bold font-display mb-1 text-foreground">Recruiter Dashboard</h1>
-    <p className="text-muted-foreground mb-8">Manage your hiring pipeline efficiently.</p>
+    <h1 className="text-3xl font-bold font-display mb-1 text-foreground text-center">Recruiter Dashboard</h1>
+    <p className="text-muted-foreground mb-8 text-center">Manage your hiring pipeline efficiently.</p>
 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map((stat, i) => (

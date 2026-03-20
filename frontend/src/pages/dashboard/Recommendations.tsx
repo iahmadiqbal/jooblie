@@ -11,11 +11,11 @@ const recommendations = [
 
 const Recommendations = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <div className="flex items-center gap-2 mb-1 mt-12 sm:mt-0">
-      <h1 className="text-3xl font-bold font-display text-foreground">AI Recommendations</h1>
+    <div className="flex items-center justify-center gap-2 mb-1 mt-12 sm:mt-0">
+      <h1 className="text-3xl font-bold font-display text-foreground text-center">AI Recommendations</h1>
       <Sparkles className="w-6 h-6 text-accent" />
     </div>
-    <p className="text-muted-foreground mb-8">Jobs matched to your profile and preferences.</p>
+    <p className="text-muted-foreground mb-8 text-center">Jobs matched to your profile and preferences.</p>
 
     <div className="space-y-4">
       {recommendations.map((job, i) => (

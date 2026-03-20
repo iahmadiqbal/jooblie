@@ -19,8 +19,8 @@ const statusColors: Record<string, string> = {
 
 const Applications = () => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-    <h1 className="text-3xl font-bold font-display mb-1 text-foreground">My Applications</h1>
-    <p className="text-muted-foreground mb-8">Track all your job applications in one place.</p>
+    <h1 className="text-3xl font-bold font-display mb-1 text-foreground text-center">My Applications</h1>
+    <p className="text-muted-foreground mb-8 text-center">Track all your job applications in one place.</p>
 
     <div className="space-y-3">
       {applications.map((app, i) => (

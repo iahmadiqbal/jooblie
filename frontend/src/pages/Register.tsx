@@ -1,7 +1,3 @@
-
-
-
-
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
@@ -14,17 +10,14 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"job_seeker" | "recruiter">("job_seeker");
-
   const [fullName, setFullName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (loading) return;
 
     if (!fullName.trim() || !email.trim() || !password.trim()) {
@@ -43,21 +36,16 @@ const Register = () => {
       const metadata = {
         full_name: fullName.trim(),
         role,
-        company_name:
-          role === "recruiter" ? companyName.trim() : null,
+        company_name: role === "recruiter" ? companyName.trim() : null,
       };
 
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
-        options: {
-          data: metadata,
-        },
+        options: { data: metadata },
       });
 
       if (error) {
-        console.error("Signup error:", error);
-
         if (error.message.toLowerCase().includes("rate limit")) {
           alert("Too many signup attempts. Please wait a few minutes.");
         } else if (error.message.toLowerCase().includes("already")) {
@@ -65,26 +53,18 @@ const Register = () => {
         } else {
           alert(error.message);
         }
-
         return;
       }
 
-      // If email confirmation is enabled, session will be null
       if (!data.session) {
         alert(
-          "Account created successfully! Please check your email to confirm your account before logging in."
+          "Account created successfully! Please check your email to confirm your account before logging in.",
         );
         return;
       }
 
-      // If confirmation is disabled, session exists immediately
-      navigate(
-        role === "recruiter"
-          ? "/recruiter/dashboard"
-          : "/dashboard"
-      );
+      navigate(role === "recruiter" ? "/recruiter/dashboard" : "/dashboard");
     } catch (err) {
-      console.error("Unexpected signup error:", err);
       alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
@@ -92,21 +72,22 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-hidden">
       <Navbar />
+      <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        {/* Floating Orbs */}
+        <div className="floating-orb w-80 h-80 bg-secondary absolute -top-10 -left-10 animate-pulse-glow" />
+        <div className="floating-orb w-64 h-64 bg-accent absolute bottom-10 -right-10 animate-pulse-glow" />
 
-      <div className="relative pt-28 pb-20 flex items-center justify-center min-h-screen">
-        <div className="floating-orb w-80 h-80 bg-secondary -top-10 -left-10 animate-pulse-glow" />
-        <div className="floating-orb w-64 h-64 bg-accent bottom-10 -right-10 animate-pulse-glow" />
-
+        {/* Glass Card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="glass-card p-8 md:p-10 w-full max-w-md mx-4 relative z-10"
+          className="glass-card w-full max-w-md mx-4 p-4 md:p-6 relative z-10"
         >
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 rounded-xl gradient-bg-primary flex items-center justify-center mx-auto mb-4">
+          <div className="text-center mb-4">
+            <div className="w-10 h-10 rounded-xl gradient-bg-primary flex items-center justify-center mx-auto mb-3">
               <Briefcase className="w-6 h-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold font-display text-foreground">
@@ -117,33 +98,32 @@ const Register = () => {
             </p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleRegister}>
-            {/* Role Toggle */}
+          <form className="space-y-3" onSubmit={handleRegister}>
             <div className="flex rounded-lg bg-muted p-1 gap-1 mb-2">
               <button
                 type="button"
                 onClick={() => setRole("job_seeker")}
-                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "job_seeker"
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
+                  role === "job_seeker"
                     ? "gradient-bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                  }`}
+                }`}
               >
                 Job Seeker
               </button>
-
               <button
                 type="button"
                 onClick={() => setRole("recruiter")}
-                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${role === "recruiter"
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${
+                  role === "recruiter"
                     ? "gradient-bg-primary text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
-                  }`}
+                }`}
               >
                 Recruiter
               </button>
             </div>
 
-            {/* Full Name */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Full Name
@@ -160,7 +140,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Company Name (Recruiter Only) */}
             {role === "recruiter" && (
               <div>
                 <label className="text-sm font-medium text-foreground mb-1.5 block">
@@ -176,7 +155,6 @@ const Register = () => {
               </div>
             )}
 
-            {/* Email */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Email
@@ -193,7 +171,6 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">
                 Password
@@ -230,7 +207,7 @@ const Register = () => {
             </button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          <p className="text-center text-sm text-muted-foreground mt-4">
             Already have an account?{" "}
             <Link
               to="/login"

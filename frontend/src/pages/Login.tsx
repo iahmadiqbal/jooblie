@@ -1,7 +1,3 @@
-
-
-
-
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Briefcase, Mail, Lock, Eye, EyeOff } from "lucide-react";
@@ -32,9 +28,8 @@ const Login = () => {
       password,
     });
 
+    console.log("data", data);
 
-    console.log("data",data);
-    
     if (error) {
       setLoading(false);
       alert(error.message);
@@ -43,7 +38,6 @@ const Login = () => {
 
     const user = data.user;
 
-    // 1️⃣ Check if profile already exists
     const { data: existingProfile, error: profileError } = await supabase
       .from("profiles")
       .select("*")
@@ -51,14 +45,12 @@ const Login = () => {
       .single();
 
     if (profileError && profileError.code !== "PGRST116") {
-      // PGRST116 = no rows found (safe)
       console.error(profileError);
       setLoading(false);
       alert("Error checking profile.");
       return;
     }
 
-    // 2️⃣ If profile does NOT exist → create it
     if (!existingProfile) {
       const { error: insertError } = await supabase.from("profiles").insert({
         id: user.id,
@@ -78,7 +70,6 @@ const Login = () => {
       }
     }
 
-    // 3️⃣ Get role (fresh read)
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
@@ -95,19 +86,22 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-hidden mt-10">
       <Navbar />
-      <div className="relative pt-28 pb-20 flex items-center justify-center min-h-screen">
-        <div className="floating-orb w-80 h-80 bg-primary -top-10 -right-10 animate-pulse-glow" />
-        <div className="floating-orb w-64 h-64 bg-secondary bottom-10 -left-10 animate-pulse-glow" />
+      <div className="relative w-full h-screen flex items-center justify-center px-4 sm:px-6">
+        {/* Floating Orbs */}
+        <div className="floating-orb w-80 h-80 bg-primary absolute -top-10 -right-10 animate-pulse-glow" />
+        <div className="floating-orb w-64 h-64 bg-secondary absolute bottom-10 -left-10 animate-pulse-glow" />
 
+        {/* Glass Card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="glass-card p-8 md:p-10 w-full max-w-md mx-4 relative z-10"
+          className="glass-card w-full max-w-md p-6 md:p-10 mx-4 relative z-10"
+          style={{ marginTop: "5vh", marginBottom: "5vh" }} // ✅ Add vertical breathing space
         >
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 md:mb-8">
             <div className="w-12 h-12 rounded-xl gradient-bg-primary flex items-center justify-center mx-auto mb-4">
               <Briefcase className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -173,7 +167,10 @@ const Login = () => {
 
           <p className="text-center text-sm text-muted-foreground mt-6">
             Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline font-medium">
+            <Link
+              to="/register"
+              className="text-primary hover:underline font-medium"
+            >
               Sign up
             </Link>
           </p>

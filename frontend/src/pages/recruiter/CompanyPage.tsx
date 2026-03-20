@@ -94,14 +94,14 @@ const CompanyPage = () => {
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      <h1 className="text-3xl font-bold font-display mb-1 text-foreground">
+      <h1 className="text-3xl font-bold font-display mb-1 text-foreground text-center">
         Company Profile
       </h1>
-      <p className="text-muted-foreground mb-8">
+      <p className="text-muted-foreground mb-8 text-center">
         Manage your company information to attract top candidates.
       </p>
 
-      <div className="glass-card p-8 max-w-2xl">
+      <div className="glass-card p-8 max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center">
             <Building2 className="w-10 h-10 text-accent" />

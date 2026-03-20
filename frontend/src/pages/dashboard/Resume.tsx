@@ -271,14 +271,14 @@ const Resume = () => {
       animate={{ opacity: 1, y: 0 }}
       className="px-4 sm:px-0"
     >
-      <h1 className="text-2xl sm:text-3xl font-bold font-display mb-1 text-foreground mt-12 sm:mt-0">
+      <h1 className="text-2xl sm:text-3xl font-bold font-display mb-1 text-foreground mt-12 sm:mt-0 text-center">
         My Resume
       </h1>
-      <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8">
+      <p className="text-sm sm:text-base text-muted-foreground mb-6 sm:mb-8 text-center">
         Upload and manage your resume to apply for jobs faster.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto w-full">
         {/* Upload */}
         <div className="glow-card p-6 sm:p-8 flex flex-col items-center justify-center text-center min-h-[240px] sm:min-h-[280px]">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3 sm:mb-4">
