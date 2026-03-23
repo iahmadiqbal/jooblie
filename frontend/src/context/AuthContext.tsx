@@ -11,47 +11,59 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const fetchRole = async (userId: string): Promise<"job_seeker" | "recruiter" | null> => {
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
+  return (data?.role as "job_seeker" | "recruiter") ?? null;
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<"job_seeker" | "recruiter" | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchRole = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
-    setRole(data?.role ?? null);
-  };
-
   useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) {
-        await fetchRole(data.session.user.id);
+    let ignore = false;
+
+    const initialize = async () => {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      if (ignore) return;
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        const r = await fetchRole(s.user.id);
+        if (!ignore) setRole(r);
       }
-      setLoading(false);
+      if (!ignore) setLoading(false);
     };
 
-    getSession();
+    initialize();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchRole(session.user.id);
-        } else {
-          setRole(null);
-        }
+    const { data: listener } = supabase.auth.onAuthStateChange((event, s) => {
+      if (ignore) return;
+      if (event === "INITIAL_SESSION") return;
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        setLoading(true);
+        fetchRole(s.user.id).then((r) => {
+          if (!ignore) {
+            setRole(r);
+            setLoading(false);
+          }
+        });
+      } else {
+        setRole(null);
+        setLoading(false);
       }
-    );
+    });
 
     return () => {
+      ignore = true;
       listener.subscription.unsubscribe();
     };
   }, []);
@@ -65,8 +77,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };

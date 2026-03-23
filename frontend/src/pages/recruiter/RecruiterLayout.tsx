@@ -28,7 +28,8 @@ const RecruiterLayout = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && role !== "recruiter") {
+  // Job seeker accidentally on recruiter dashboard → redirect
+  if (role === "job_seeker") {
     return <Navigate to="/dashboard" replace />;
   }
 
