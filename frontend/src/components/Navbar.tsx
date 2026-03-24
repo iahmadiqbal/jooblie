@@ -1,8 +1,19 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Briefcase, Menu, X, Moon, Sun } from "lucide-react";
+import {
+  Briefcase,
+  Menu,
+  X,
+  Moon,
+  Sun,
+  LogOut,
+  LayoutDashboard,
+} from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 const navItems = [
   { label: "Jobs", href: "/jobs" },
@@ -13,7 +24,25 @@ const navItems = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user, role, loading } = useAuth();
+
+  const dashboardPath =
+    role === "recruiter" ? "/recruiter/dashboard" : "/dashboard";
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      toast.error(error.message || "Failed to sign out");
+      return;
+    }
+
+    toast.success("Signed out successfully");
+    setOpen(false);
+    navigate("/");
+  };
 
   return (
     <motion.nav
@@ -32,7 +61,6 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <Link
@@ -61,21 +89,43 @@ const Navbar = () => {
               <Sun className="w-5 h-5" />
             )}
           </button>
-          <Link
-            to="/login"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
-          >
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="text-sm font-medium gradient-bg-primary text-primary-foreground px-5 py-2 rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Get Started
-          </Link>
+
+          {loading ? null : user ? (
+            <>
+              <Link
+                to={dashboardPath}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2 inline-flex items-center gap-2"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Dashboard
+              </Link>
+
+              <button
+                onClick={handleSignOut}
+                className="text-sm font-medium gradient-bg-primary text-primary-foreground px-5 py-2 rounded-lg hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="text-sm font-medium gradient-bg-primary text-primary-foreground px-5 py-2 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
-        {/* Mobile toggle */}
         <div className="md:hidden flex items-center gap-2">
           <button
             onClick={toggleTheme}
@@ -88,16 +138,13 @@ const Navbar = () => {
               <Sun className="w-5 h-5" />
             )}
           </button>
-          <button
-            className="text-foreground"
-            onClick={() => setOpen(!open)}
-          >
+
+          <button className="text-foreground" onClick={() => setOpen(!open)}>
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {open && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -115,21 +162,43 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+
             <div className="flex flex-col gap-2 pt-2 border-t border-border">
-              <Link
-                to="/login"
-                onClick={() => setOpen(false)}
-                className="text-sm font-medium text-muted-foreground py-2"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                onClick={() => setOpen(false)}
-                className="text-sm font-medium gradient-bg-primary text-primary-foreground px-4 py-2 rounded-lg text-center"
-              >
-                Get Started
-              </Link>
+              {loading ? null : user ? (
+                <>
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium text-muted-foreground py-2"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <button
+                    onClick={handleSignOut}
+                    className="text-sm font-medium gradient-bg-primary text-primary-foreground px-4 py-2 rounded-lg text-center"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium text-muted-foreground py-2"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setOpen(false)}
+                    className="text-sm font-medium gradient-bg-primary text-primary-foreground px-4 py-2 rounded-lg text-center"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

@@ -84,7 +84,7 @@ const Footer = () => (
               <FaFacebookF className="w-4 h-4" />
             </a>
             <a
-              href="https://www.instagram.com/jooobliejooblie/"
+              href="https://www.instagram.com/joobliejooblie/"
               target="_blank"
               rel="noopener noreferrer"
               className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
