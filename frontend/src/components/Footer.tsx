@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Briefcase } from "lucide-react";
+import { FaFacebookF, FaInstagram, FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => (
   <footer className="mt-12 sm:mt-16 md:mt-20 border-t border-border bg-card/50">
@@ -71,16 +72,32 @@ const Footer = () => (
         </div>
         <div>
           <h4 className="font-display font-semibold text-foreground mb-4">
-            Connect
+            Follow Us
           </h4>
           <div className="flex gap-3">
             <a
-              href="#"
+              href="https://www.facebook.com/jooblie"
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
+              <FaFacebookF className="w-4 h-4" />
+            </a>
+            <a
+              href="https://www.instagram.com/jooobliejooblie/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
+            >
+              <FaInstagram className="w-4 h-4" />
+            </a>
+            <a
+              href="https://x.com/Jooblie01"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted/80 transition-colors"
+            >
+              <FaXTwitter className="w-4 h-4" />
             </a>
           </div>
         </div>
