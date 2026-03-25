@@ -5,39 +5,61 @@ import Footer from "@/components/Footer";
 import AnimatedSection from "@/components/AnimatedSection";
 import { supabase } from "@/lib/supabase";
 
-interface JobCompanyRow {
+interface ProfileCompanyRow {
+  id: string;
   company_name: string | null;
+  company_size: string | null;
   location: string | null;
-  status: string | null;
+  industry: string | null;
+  about: string | null;
+  role: string;
 }
 
-interface CompanyCard {
-  name: string;
-  location: string;
-  openJobs: number;
+interface JobRow {
+  recruiter_id: string;
 }
 
 const Companies = () => {
-  const [rows, setRows] = useState<JobCompanyRow[]>([]);
+  const [profiles, setProfiles] = useState<ProfileCompanyRow[]>([]);
+  const [jobs, setJobs] = useState<JobRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompanies = async () => {
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("jobs")
-        .select("company_name, location, status")
-        .eq("status", "active");
+      const [profilesRes, jobsRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("id, company_name, company_size, location, industry, about, role")
+          .eq("role", "recruiter")
+          .not("company_name", "is", null),
 
-      if (error) {
-        console.error("Fetch companies error:", error);
-        setRows([]);
-        setLoading(false);
-        return;
+        supabase
+          .from("jobs")
+          .select("recruiter_id")
+          .eq("status", "active"),
+      ]);
+
+      console.log("profiles error", profilesRes.error);
+      console.log("profiles data", profilesRes.data);
+      console.log("jobs error", jobsRes.error);
+      console.log("jobs data", jobsRes.data);
+
+      if (profilesRes.error) {
+        console.error("Fetch profiles error:", profilesRes.error);
+        setProfiles([]);
+      } else {
+        setProfiles(profilesRes.data || []);
       }
 
-      setRows(data || []);
+      if (jobsRes.error) {
+        console.error("Fetch jobs error:", jobsRes.error);
+        setJobs([]);
+      } else {
+        setJobs(jobsRes.data || []);
+      }
+
       setLoading(false);
     };
 
@@ -45,33 +67,28 @@ const Companies = () => {
   }, []);
 
   const companies = useMemo(() => {
-    const grouped = new Map<string, CompanyCard>();
+    const jobsCountMap = new Map<string, number>();
 
-    for (const row of rows) {
-      const name = row.company_name?.trim() || "Unknown Company";
-      const location = row.location?.trim() || "Not specified";
-
-      if (grouped.has(name)) {
-        const existing = grouped.get(name)!;
-        existing.openJobs += 1;
-
-        if (
-          existing.location === "Not specified" &&
-          location !== "Not specified"
-        ) {
-          existing.location = location;
-        }
-      } else {
-        grouped.set(name, {
-          name,
-          location,
-          openJobs: 1,
-        });
-      }
+    for (const job of jobs) {
+      jobsCountMap.set(
+        job.recruiter_id,
+        (jobsCountMap.get(job.recruiter_id) || 0) + 1
+      );
     }
 
-    return Array.from(grouped.values()).sort((a, b) => b.openJobs - a.openJobs);
-  }, [rows]);
+    return profiles
+      .filter((profile) => profile.company_name && profile.company_name.trim() !== "")
+      .map((profile) => ({
+        id: profile.id,
+        name: profile.company_name?.trim() || "Unknown Company",
+        location: profile.location?.trim() || "Not specified",
+        industry: profile.industry?.trim() || "Not specified",
+        employees: profile.company_size?.trim() || "Not specified",
+        description: profile.about?.trim() || "Hiring now on Jooblie.",
+        openJobs: jobsCountMap.get(profile.id) || 0,
+      }))
+      .sort((a, b) => b.openJobs - a.openJobs);
+  }, [profiles, jobs]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,7 +121,7 @@ const Companies = () => {
           ) : companies.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
               {companies.map((c, i) => (
-                <AnimatedSection key={c.name} delay={i * 0.1}>
+                <AnimatedSection key={c.id} delay={i * 0.1}>
                   <div className="backdrop-blur-xl bg-card/50 border border-border rounded-xl p-5 sm:p-6 h-full flex flex-col hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
@@ -120,8 +137,12 @@ const Companies = () => {
                       {c.name}
                     </h3>
 
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-2">
-                      Hiring now on Jooblie.
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-2">
+                      {c.industry}
+                    </p>
+
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-3 line-clamp-3">
+                      {c.description}
                     </p>
 
                     <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-muted-foreground mt-auto pt-3 sm:pt-4 border-t border-border">
@@ -132,7 +153,7 @@ const Companies = () => {
 
                       <span className="flex items-center gap-1">
                         <Users className="w-3 h-3 flex-shrink-0" />
-                        Active Hiring
+                        {c.employees}
                       </span>
                     </div>
                   </div>
@@ -146,7 +167,7 @@ const Companies = () => {
                   No companies available
                 </h2>
                 <p className="text-muted-foreground">
-                  No active companies are hiring right now.
+                  No recruiter companies are available right now.
                 </p>
               </div>
             </AnimatedSection>

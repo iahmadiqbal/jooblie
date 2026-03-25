@@ -9,7 +9,7 @@ const sidebarLinks = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "Applications", href: "/dashboard/applications", icon: FileText },
   { label: "Saved jobs", href: "/dashboard/saved", icon: FileText },
-  { label: "Recommendations", href: "/dashboard/recommendations", icon: Star },
+  // { label: "Recommendations", href: "/dashboard/recommendations", icon: Star },
   { label: "Profile", href: "/dashboard/profile", icon: User },
   { label: "Resume", href: "/dashboard/resume", icon: File },
 ];
