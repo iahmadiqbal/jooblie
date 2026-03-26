@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 
 const Profile = () => {
   const { user, loading } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [fullName, setFullName] = useState("");
   const [location, setLocation] = useState("");
   const [bio, setBio] = useState("");
@@ -46,6 +48,7 @@ const Profile = () => {
           setSkills(data.skills || "");
           setRole(data.role || "");
           setCompanyName(data.company_name || "");
+          setAvatarUrl(data.avatar_url || null);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -56,6 +59,10 @@ const Profile = () => {
 
     fetchProfile();
   }, [user]);
+const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files || e.target.files.length === 0) return;
+  setAvatarFile(e.target.files[0]);
+};
 
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +77,29 @@ const Profile = () => {
         console.error("No authenticated user");
         return;
       }
+let uploadedAvatarUrl = avatarUrl;
 
+if (avatarFile) {
+  const fileExt = avatarFile.name.split(".").pop();
+  const fileName = `${user.id}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("profile_avatars")
+    .upload(fileName, avatarFile, {
+      upsert: true,
+    });
+
+  if (uploadError) {
+    console.error(uploadError);
+  } else {
+    const { data } = supabase.storage
+      .from("profile_avatars")
+      .getPublicUrl(fileName);
+
+    uploadedAvatarUrl = data.publicUrl;
+    setAvatarUrl(uploadedAvatarUrl);
+  }
+}
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -79,8 +108,10 @@ const Profile = () => {
           about: bio,
           job_title: jobTitle,
           skills: skills,
+           avatar_url: uploadedAvatarUrl,
         })
         .eq("id", authData.user.id);
+
 
       if (error) {
         console.error("Error updating profile:", error);
@@ -121,9 +152,40 @@ const Profile = () => {
 
       <div className="glass-card p-8 max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-20 h-20 rounded-full gradient-bg-primary flex items-center justify-center">
-            <User className="w-10 h-10 text-primary-foreground" />
-          </div>
+         
+<div className="flex flex-col items-center">
+  {/* Avatar */}
+  <label className="w-20 h-20 rounded-full overflow-hidden border cursor-pointer group relative">
+    {avatarUrl ? (
+      <img
+        src={avatarUrl}
+        alt="avatar"
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      <div className="w-full h-full gradient-bg-primary flex items-center justify-center">
+        <User className="w-10 h-10 text-primary-foreground" />
+      </div>
+    )}
+
+    {/* Hover overlay */}
+    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition">
+      Change
+    </div>
+
+    {/* Hidden input */}
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleAvatarChange}
+      className="hidden"
+    />
+  </label>
+
+  <p className="text-xs text-muted-foreground mt-2">
+    Click to upload
+  </p>
+</div>
           <div>
             <h2 className="text-xl font-bold font-display text-foreground">
               {fullName || ""}

@@ -29,6 +29,8 @@ import CompanyPage from "./pages/recruiter/CompanyPage";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "react-hot-toast";
 import SavedJobs from "./pages/dashboard/SavedJobs";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/register" element={<Register />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/companies" element={<Companies />} />
