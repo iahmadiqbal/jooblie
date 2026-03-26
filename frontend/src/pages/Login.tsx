@@ -130,40 +130,49 @@ const Login = () => {
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                />
-                <div className="text-right">
-  <Link
-    to="/forgot-password"
-    className="text-sm text-primary hover:underline"
-  >
-    Forgot Password?
-  </Link>
+          <div>
+  <label className="text-sm font-medium text-foreground mb-1.5 block">
+    Password
+  </label>
+
+  {/* Input Wrapper */}
+  <div className="relative">
+    {/* Lock Icon */}
+    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+
+    {/* Input */}
+    <input
+      type={showPassword ? "text" : "password"}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      placeholder="••••••••"
+      className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+    />
+
+    {/* Eye Icon */}
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+    >
+      {showPassword ? (
+        <EyeOff className="w-4 h-4" />
+      ) : (
+        <Eye className="w-4 h-4" />
+      )}
+    </button>
+  </div>
+
+  {/* Forgot Password BELOW input */}
+  <div className="text-right mt-1">
+    <Link
+      to="/forgot-password"
+      className="text-sm text-primary hover:underline"
+    >
+      Forgot Password?
+    </Link>
+  </div>
 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            </div>
 
             <button
               disabled={loading}
