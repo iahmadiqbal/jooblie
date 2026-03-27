@@ -25,7 +25,12 @@ import RecruiterDashboard from "./pages/recruiter/RecruiterDashboard";
 import RecruiterJobs from "./pages/recruiter/RecruiterJobs";
 import CreateJob from "./pages/recruiter/CreateJob";
 import CompanyPage from "./pages/recruiter/CompanyPage";
-
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCompanies from "./pages/admin/AdminCompanies";
+import AdminJobSeekers from "./pages/admin/AdminJobSeekers";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminApplications from "./pages/admin/AdminApplications";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "react-hot-toast";
 import SavedJobs from "./pages/dashboard/SavedJobs";
@@ -73,6 +78,15 @@ const App = () => (
                 <Route path="create-job" element={<CreateJob />} />
                 <Route path="company" element={<CompanyPage />} />
               </Route>
+
+              {/* Admin Dashboard */}
+              <Route path="/admin" element={<AdminLayout />}>
+  <Route index element={<AdminDashboard />} />
+  <Route path="companies" element={<AdminCompanies />} />
+  <Route path="job-seekers" element={<AdminJobSeekers />} />
+  <Route path="jobs" element={<AdminJobs />} />
+  <Route path="applications" element={<AdminApplications />} />
+</Route>
 
               <Route path="*" element={<NotFound />} />
             </Routes>

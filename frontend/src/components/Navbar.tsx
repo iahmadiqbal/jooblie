@@ -29,7 +29,11 @@ const Navbar = () => {
   const { user, role, loading } = useAuth();
 
   const dashboardPath =
-    role === "recruiter" ? "/recruiter/dashboard" : "/dashboard";
+    role === "recruiter"
+      ? "/recruiter/dashboard"
+      : role === "admin"
+        ? "/admin"
+        : "/dashboard";
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();

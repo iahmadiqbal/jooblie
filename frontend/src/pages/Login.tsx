@@ -13,78 +13,99 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
+  if (!email || !password) {
+    alert("Please fill all fields");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  console.log("auth data", data);
+
+  if (error) {
+    setLoading(false);
+    alert(error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  const { data: existingProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  console.log("existingProfile", existingProfile);
+  console.log("profileError", profileError);
+
+  if (profileError) {
+    console.error("Profile check error:", profileError);
+    setLoading(false);
+    alert(profileError.message || "Error checking profile.");
+    return;
+  }
+
+  if (!existingProfile) {
+    const role =
+      user.user_metadata?.role === "admin"
+        ? "admin"
+        : user.user_metadata?.role === "recruiter"
+        ? "recruiter"
+        : "job_seeker";
+
+    const { error: insertError } = await supabase.from("profiles").insert({
+      id: user.id,
+      role,
+      full_name: user.user_metadata?.full_name || "User",
+      company_name:
+        role === "recruiter"
+          ? user.user_metadata?.company_name || null
+          : null,
     });
 
-    console.log("data", data);
-
-    if (error) {
+    if (insertError) {
+      console.error("Insert profile error:", insertError);
       setLoading(false);
-      alert(error.message);
+      alert(insertError.message || "Failed to create profile.");
       return;
     }
+  }
 
-    const user = data.user;
+  const { data: profile, error: roleError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
 
-    const { data: existingProfile, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
+  console.log("role profile", profile);
+  console.log("role error", roleError);
 
-    if (profileError && profileError.code !== "PGRST116") {
-      console.error(profileError);
-      setLoading(false);
-      alert("Error checking profile.");
-      return;
-    }
-
-    if (!existingProfile) {
-      const { error: insertError } = await supabase.from("profiles").insert({
-        id: user.id,
-        role: user.user_metadata?.role || "job_seeker",
-        full_name: user.user_metadata?.full_name || "User",
-        company_name:
-          user.user_metadata?.role === "recruiter"
-            ? user.user_metadata?.company_name
-            : null,
-      });
-
-      if (insertError) {
-        console.error(insertError);
-        setLoading(false);
-        alert("Failed to create profile.");
-        return;
-      }
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
+  if (roleError) {
+    console.error("Role fetch error:", roleError);
     setLoading(false);
+    alert(roleError.message || "Failed to get profile role.");
+    return;
+  }
 
-    if (profile?.role === "recruiter") {
-      navigate("/recruiter/dashboard");
-    } else {
-      navigate("/dashboard");
-    }
-  };
+  setLoading(false);
 
+  if (profile?.role === "admin") {
+    navigate("/admin");
+  } else if (profile?.role === "recruiter") {
+    navigate("/recruiter/dashboard");
+  } else {
+    navigate("/dashboard");
+  }
+};
   return (
     <div className="min-h-screen bg-background overflow-hidden mt-10">
       <Navbar />
