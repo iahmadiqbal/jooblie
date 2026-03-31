@@ -125,10 +125,10 @@ const handleApplyNow = async () => {
     return;
   }
 
-  // get applicant profile
+  // ✅ Fetch full profile
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("resume_path")
+    .select("resume_path, location, job_title, skills, about")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -139,12 +139,24 @@ const handleApplyNow = async () => {
     return;
   }
 
-  if (!profile?.resume_path) {
-    toast.error("Please upload your resume first");
+  // ✅ VALIDATION CHECK
+  const missingFields: string[] = [];
+
+  if (!profile?.resume_path) missingFields.push("Resume");
+  if (!profile?.location) missingFields.push("Location");
+  if (!profile?.job_title) missingFields.push("Job Title");
+  if (!profile?.skills) missingFields.push("Skills");
+  if (!profile?.about) missingFields.push("Bio");
+
+  if (missingFields.length > 0) {
+    toast.error(
+      `Complete your profile: ${missingFields.join(", ")} required`
+    );
     setApplying(false);
     return;
   }
 
+  // ✅ APPLY
   const { error } = await supabase.from("applications").insert({
     job_id: id,
     applicant_id: user.id,
@@ -154,6 +166,10 @@ const handleApplyNow = async () => {
   if (error) {
     console.error("Apply error:", error);
     toast.error(error.message || "Failed to apply");
+    toast.error(
+  `Complete your profile first: ${missingFields.join(", ")}`
+);
+navigate("/profile");
     setApplying(false);
     return;
   }

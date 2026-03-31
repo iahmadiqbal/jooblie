@@ -11,7 +11,7 @@ const sidebarLinks = [
   { label: "Saved jobs", href: "/dashboard/saved", icon: FileText },
   // { label: "Recommendations", href: "/dashboard/recommendations", icon: Star },
   { label: "Profile", href: "/dashboard/profile", icon: User },
-  { label: "Resume", href: "/dashboard/resume", icon: File },
+  { label: "Resume with AI", href: "/dashboard/resume", icon: File },
 ];
 
 const DashboardLayout = () => {

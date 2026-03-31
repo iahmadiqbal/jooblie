@@ -29,7 +29,8 @@ const DashboardIndex = () => {
   const [savedJobsCount, setSavedJobsCount] = useState(0);
   const [profileViewsCount, setProfileViewsCount] = useState(0);
   const [recentApplications, setRecentApplications] = useState<RecentApplication[]>([]);
-
+const [selectedJob, setSelectedJob] = useState<any>(null);
+const [modalOpen, setModalOpen] = useState(false);
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -67,9 +68,13 @@ const DashboardIndex = () => {
             id,
             created_at,
             jobs (
-              id,
-              title,
-              company_name
+               id,
+    title,
+    company_name,
+    location,
+    salary_min,
+    salary_max,
+    description
             )
           `)
           .eq("applicant_id", user.id)
@@ -199,33 +204,115 @@ const DashboardIndex = () => {
           ) : (
             <div className="space-y-3">
               {recentApplications.map((app) => (
-                <div
-                  key={app.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                >
-                  <div>
-                    <h3 className="text-sm font-medium text-foreground">
-                      {app.job?.title || "Unknown Job"}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {app.job?.company_name || "Unknown Company"}
-                    </p>
-                  </div>
+              <div
+  key={app.id}
+  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+>
+  <div>
+    <h3 className="text-sm font-medium text-foreground">
+      {app.job?.title || "Unknown Job"}
+    </h3>
+    <p className="text-xs text-muted-foreground">
+      {app.job?.company_name || "Unknown Company"}
+    </p>
+  </div>
 
-                  <div className="text-right">
-                    <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
-                      Applied
-                    </span>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formatDate(app.created_at)}
-                    </p>
-                  </div>
-                </div>
+  <div className="flex items-center gap-3">
+    <div className="text-right">
+      <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
+        Applied
+      </span>
+      <p className="text-xs text-muted-foreground mt-1">
+        {formatDate(app.created_at)}
+      </p>
+    </div>
+
+    {/* 👁 View Button */}
+    <button
+      onClick={() => {
+        setSelectedJob(app.job);
+        setModalOpen(true);
+      }}
+      className="p-2 rounded-lg hover:bg-muted"
+    >
+      <Eye className="w-4 h-4 text-muted-foreground" />
+    </button>
+  </div>
+</div>
               ))}
             </div>
           )}
         </div>
+        {modalOpen && selectedJob && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-background rounded-xl p-6 w-full max-w-2xl shadow-xl max-h-[85vh] overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h2 className="text-xl font-bold">
+            {selectedJob.title}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {selectedJob.company_name}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setModalOpen(false)}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
+        <span>
+          📍 {selectedJob.location || "Not specified"}
+        </span>
+
+        <span>
+          💰 {selectedJob.salary_min && selectedJob.salary_max
+            ? `${selectedJob.salary_min} - ${selectedJob.salary_max}`
+            : "Salary not specified"}
+        </span>
+      </div>
+
+      {/* Description */}
+      <div>
+        <h3 className="text-sm font-semibold mb-2">Description</h3>
+        <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+          {selectedJob.description || "No description available"}
+        </p>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={() =>
+            (window.location.href = `/jobs/${selectedJob.id}`)
+          }
+          className="px-4 py-2 border rounded-lg hover:bg-muted"
+        >
+          Open Full Page
+        </button>
+
+        <button
+          onClick={() => setModalOpen(false)}
+          className="px-4 py-2 bg-primary text-white rounded-lg"
+        >
+          Close
+        </button>
+      </div>
+    </motion.div>
+  </div>
+)}
       </motion.div>
+
 
       <Chatbot context="dashboard" />
     </div>

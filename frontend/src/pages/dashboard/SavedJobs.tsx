@@ -19,7 +19,8 @@ interface SavedJob {
 const SavedJobs = () => {
   const [jobs, setJobs] = useState<SavedJob[]>([]);
   const [loading, setLoading] = useState(true);
-
+const [selectedJob, setSelectedJob] = useState<any>(null);
+const [modalOpen, setModalOpen] = useState(false);
   useEffect(() => {
     fetchSavedJobs();
   }, []);
@@ -48,7 +49,8 @@ const SavedJobs = () => {
           company_name,
           location,
           salary_min,
-          salary_max
+          salary_max,
+           description
         )
       `)
       .eq("user_id", user.id)
@@ -140,10 +142,89 @@ console.log("dataaa",data);
               >
                 <Trash2 className="w-4 h-4" />
               </button>
+              <button
+  onClick={() => {
+    setSelectedJob(item.job);
+    setModalOpen(true);
+  }}
+  className="text-xs px-3 py-2 rounded-lg border border-border hover:bg-muted transition"
+>
+  View
+</button>
             </motion.div>
           ))}
         </div>
       )}
+      {modalOpen && selectedJob && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-background rounded-xl p-6 w-full max-w-2xl shadow-xl max-h-[85vh] overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h2 className="text-xl font-bold">
+            {selectedJob.title}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {selectedJob.company_name}
+          </p>
+        </div>
+
+        <button
+          onClick={() => setModalOpen(false)}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-6">
+        <span className="flex items-center gap-1">
+          <MapPin className="w-4 h-4" />
+          {selectedJob.location || "Not specified"}
+        </span>
+
+        <span className="flex items-center gap-1">
+          <DollarSign className="w-4 h-4" />
+          {selectedJob.salary_min && selectedJob.salary_max
+            ? `${selectedJob.salary_min} - ${selectedJob.salary_max}`
+            : "Salary not specified"}
+        </span>
+      </div>
+
+      {/* Description */}
+      <div>
+        <h3 className="text-sm font-semibold mb-2">Description</h3>
+        <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+          {selectedJob.description || "No description available"}
+        </p>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 flex justify-between">
+        <button
+          onClick={() =>
+            (window.location.href = `/jobs/${selectedJob.id}`)
+          }
+          className="px-4 py-2 border rounded-lg hover:bg-muted"
+        >
+          Open Full Page
+        </button>
+
+        <button
+          onClick={() => setModalOpen(false)}
+          className="px-4 py-2 bg-primary text-white rounded-lg"
+        >
+          Close
+        </button>
+      </div>
+    </motion.div>
+  </div>
+)}
     </motion.div>
   );
 };

@@ -18,9 +18,10 @@ interface JobFormData {
 interface JobFormErrors {
   title?: string;
   location?: string;
-   salary_min?: string;
+  salary_min?: string;
   salary_max?: string;
   description?: string;
+  profile?: string;
 }
 
 const LOCAL_STORAGE_KEY = "createJobDraft";
@@ -57,100 +58,135 @@ const CreateJob = () => {
     setErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
-  const validate = () => {
-    const newErrors: JobFormErrors = {};
+const validate = () => {
+  const newErrors: JobFormErrors = {};
 
-    if (!formData.title.trim()) newErrors.title = "Job title is required";
-    if (!formData.location.trim()) newErrors.location = "Location is required";
-if (
-  formData.salary_min &&
-  formData.salary_max &&
-  Number(formData.salary_min) > Number(formData.salary_max)
-) {
-  newErrors.salary_max = "Maximum salary must be greater than minimum salary";
-}
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    }
+  if (!formData.title.trim()) newErrors.title = "Job title is required";
+  if (!formData.location.trim()) newErrors.location = "Location is required";
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  if (
+    formData.salary_min &&
+    formData.salary_max &&
+    Number(formData.salary_min) > Number(formData.salary_max)
+  ) {
+    newErrors.salary_max = "Maximum salary must be greater than minimum salary";
+  }
+
+  if (!formData.description.trim()) {
+    newErrors.description = "Description is required";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validate()) {
-      toast.error("Please fix the errors in the form");
+  if (!validate()) {
+    toast.error("Please fix the errors in the form");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      toast.error("You must be logged in to post a job");
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("company_name, website, company_size, about, location, industry")
+      .eq("id", user.id)
+      .single();
 
-    try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        toast.error("You must be logged in to post a job");
-        setLoading(false);
-        return;
-      }
-
-      const skillsArray = formData.skills
-        .split(",")
-        .map((skill) => skill.trim())
-        .filter(Boolean);
-
-        const { data: profile } = await supabase
-  .from("profiles")
-  .select("company_name")
-  .eq("id", user.id)
-  .single();
-   const { error } = await supabase.from("jobs").insert({
-  title: formData.title.trim(),
-  company_name: profile?.company_name || "Unknown Company", // ✅ FIX
-  location: formData.location.trim(),
-  salary_min: formData.salary_min.trim(),
-  salary_max: formData.salary_max.trim(),
-  job_type: formData.job_type,
-  experience: formData.experience,
-  description: formData.description.trim(),
-  skills: skillsArray,
-  recruiter_id: user.id,
-});
-
-      if (error) {
-        console.error("Insert job error:", error);
-        toast.error(error.message || "Failed to publish job");
-        setLoading(false);
-        return;
-      }
-
-      toast.success("Job published successfully");
-
-      setFormData({
-        title: "",
-        location: "",
-        salary_min: "",
-  salary_max: "",
-        job_type: "Full-time",
-        experience: "Junior",
-        description: "",
-        skills: "",
-      });
-
-      setErrors({});
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast.error("Something went wrong");
-    } finally {
+    if (profileError || !profile) {
+      toast.error("Please complete your company profile before posting a job");
+      setErrors((prev) => ({
+        ...prev,
+        profile: "Company profile not found. Please complete it first.",
+      }));
       setLoading(false);
+      return;
     }
-  };
+
+    const missingProfileFields = [
+      !profile.company_name?.trim() && "Company Name",
+      !profile.website?.trim() && "Website",
+      !profile.company_size?.trim() && "Company Size",
+      !profile.about?.trim() && "About",
+      !profile.location?.trim() && "Location",
+      !profile.industry?.trim() && "Industry",
+    ].filter(Boolean);
+
+    if (missingProfileFields.length > 0) {
+      const message = `Complete company profile first: ${missingProfileFields.join(", ")}`;
+
+      setErrors((prev) => ({
+        ...prev,
+        profile: message,
+      }));
+
+      toast.error(message);
+      setLoading(false);
+      return;
+    }
+
+    const skillsArray = formData.skills
+      .split(",")
+      .map((skill) => skill.trim())
+      .filter(Boolean);
+
+    const { error } = await supabase.from("jobs").insert({
+      title: formData.title.trim(),
+      company_name: profile.company_name.trim(),
+      location: formData.location.trim(),
+      salary_min: formData.salary_min.trim() || null,
+      salary_max: formData.salary_max.trim() || null,
+      job_type: formData.job_type,
+      experience: formData.experience,
+      description: formData.description.trim(),
+      skills: skillsArray.length > 0 ? skillsArray : null,
+      recruiter_id: user.id,
+    });
+
+    if (error) {
+      console.error("Insert job error:", error);
+      toast.error(error.message || "Failed to publish job");
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Job published successfully");
+
+    setFormData({
+      title: "",
+      location: "",
+      salary_min: "",
+      salary_max: "",
+      job_type: "Full-time",
+      experience: "Junior",
+      description: "",
+      skills: "",
+    });
+
+    setErrors({});
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    toast.error("Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSaveDraft = () => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(formData));
@@ -168,6 +204,11 @@ if (
 
       <div className="glass-card p-8 max-w-3xl mx-auto">
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {errors.profile && (
+  <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3">
+    <p className="text-sm text-red-500">{errors.profile}</p>
+  </div>
+)}
           <div>
             <label className="text-sm font-medium text-foreground mb-1.5 block">
               Job Title

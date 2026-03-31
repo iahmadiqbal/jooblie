@@ -18,6 +18,29 @@ interface ApplicantRow {
 interface ApplicantProfile {
   id: string;
   full_name: string | null;
+  job_title: string | null;
+  location: string | null;
+  about: string | null;
+  skills: string | null;
+  email?: string | null;
+  resume_path?: string | null;
+  resume_file_name?: string | null;
+  resume_uploaded_at?: string | null;
+}
+
+interface RecentApplicant {
+  id: string;
+  applicantId: string;
+  name: string;
+  role: string;
+  status: string;
+  jobTitle: string;
+  location: string;
+  bio: string;
+  skills: string;
+  resumePath: string | null;
+  resumeFileName: string | null;
+  appliedAt: string;
 }
 
 const RecruiterDashboard = () => {
@@ -26,10 +49,9 @@ const RecruiterDashboard = () => {
   const [totalApplicantsCount, setTotalApplicantsCount] = useState(0);
   const [jobViewsCount, setJobViewsCount] = useState(0);
   const [hireRate, setHireRate] = useState("0%");
-  const [recentApplicants, setRecentApplicants] = useState<
-    { id: string; name: string; role: string; status: string }[]
-  >([]);
-
+ const [recentApplicants, setRecentApplicants] = useState<RecentApplicant[]>([]);
+const [selectedApplicant, setSelectedApplicant] = useState<RecentApplicant | null>(null);
+const [downloadingResume, setDownloadingResume] = useState(false);
   useEffect(() => {
     const fetchRecruiterDashboard = async () => {
       setLoading(true);
@@ -120,10 +142,12 @@ const RecruiterDashboard = () => {
       let applicantProfiles: ApplicantProfile[] = [];
 
       if (uniqueApplicantIds.length > 0) {
-        const { data: profilesData, error: profilesError } = await supabase
-          .from("profiles")
-          .select("id, full_name")
-          .in("id", uniqueApplicantIds);
+       const { data: profilesData, error: profilesError } = await supabase
+  .from("profiles")
+  .select(
+    "id, full_name, job_title, location, about, skills, resume_path, resume_file_name, resume_uploaded_at"
+  )
+  .in("id", uniqueApplicantIds);
 
         if (profilesError) {
           console.error("Applicant profiles error:", profilesError);
@@ -132,16 +156,30 @@ const RecruiterDashboard = () => {
         }
       }
 
-      const profileMap = new Map(
-        applicantProfiles.map((profile) => [profile.id, profile.full_name || "Unknown Applicant"])
-      );
+    
 
-      const recent = typedApplications.slice(0, 5).map((app) => ({
-        id: app.id,
-        name: profileMap.get(app.applicant_id) || "Unknown Applicant",
-        role: app.jobs?.title || "Unknown Job",
-        status: "Applied",
-      }));
+   const profileMap = new Map(
+  applicantProfiles.map((profile) => [profile.id, profile])
+);
+
+const recent: RecentApplicant[] = typedApplications.slice(0, 5).map((app) => {
+  const profile = profileMap.get(app.applicant_id);
+
+  return {
+    id: app.id,
+    applicantId: app.applicant_id,
+    name: profile?.full_name || "Unknown Applicant",
+    role: app.jobs?.title || "Unknown Job",
+    status: "Applied",
+    jobTitle: profile?.job_title || "Not specified",
+    location: profile?.location || "Not specified",
+    bio: profile?.about || "No bio added",
+    skills: profile?.skills || "",
+    resumePath: profile?.resume_path || null,
+    resumeFileName: profile?.resume_file_name || null,
+    appliedAt: app.created_at,
+  };
+});
 
       setRecentApplicants(recent);
 
@@ -184,6 +222,33 @@ const RecruiterDashboard = () => {
     ],
     [loading, activeJobsCount, totalApplicantsCount, jobViewsCount, hireRate]
   );
+
+  const handleResumeDownload = async (resumePath: string | null) => {
+  if (!resumePath) return;
+
+  setDownloadingResume(true);
+
+  try {
+    const { data, error } = await supabase.storage
+      .from("resumes")
+      .createSignedUrl(resumePath, 60);
+
+    if (error) {
+      console.error("Resume download error:", error);
+      toast.error("Failed to generate resume link");
+      return;
+    }
+
+    if (data?.signedUrl) {
+      window.open(data.signedUrl, "_blank");
+    }
+  } catch (error) {
+    console.error("Resume download error:", error);
+    toast.error("Unable to download resume");
+  } finally {
+    setDownloadingResume(false);
+  }
+};
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -243,15 +308,148 @@ const RecruiterDashboard = () => {
                   </div>
                 </div>
 
-                <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
-                  {a.status}
-                </span>
+              <div className="flex items-center gap-2">
+  <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
+    {a.status}
+  </span>
+
+  <button
+    onClick={() => setSelectedApplicant(a)}
+    className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-muted transition-colors"
+  >
+    View Details
+  </button>
+</div>
               </div>
             ))}
           </div>
         )}
       </div>
+{selectedApplicant && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+    <div className="glass-card w-full max-w-2xl p-6 rounded-2xl max-h-[90vh] overflow-y-auto">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-semibold text-foreground">
+          Applicant Details
+        </h2>
+        <button
+          onClick={() => setSelectedApplicant(null)}
+          className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+        >
+          ✕
+        </button>
+      </div>
 
+      <div className="space-y-5">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full gradient-bg-primary flex items-center justify-center text-primary-foreground text-lg font-bold">
+            {selectedApplicant.name.charAt(0).toUpperCase()}
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-foreground">
+              {selectedApplicant.name}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Applied for: {selectedApplicant.role}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="rounded-xl bg-muted/40 p-4">
+            <h4 className="font-semibold text-foreground mb-1">Job Title</h4>
+            <p className="text-sm text-muted-foreground">
+              {selectedApplicant.jobTitle}
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-muted/40 p-4">
+            <h4 className="font-semibold text-foreground mb-1">Location</h4>
+            <p className="text-sm text-muted-foreground">
+              {selectedApplicant.location}
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h4 className="font-semibold text-foreground mb-2">Bio</h4>
+          <p className="text-sm text-muted-foreground whitespace-pre-line">
+            {selectedApplicant.bio}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h4 className="font-semibold text-foreground mb-2">Skills</h4>
+          {selectedApplicant.skills ? (
+            <div className="flex flex-wrap gap-2">
+              {selectedApplicant.skills
+                .split(",")
+                .map((skill) => skill.trim())
+                .filter(Boolean)
+                .map((skill) => (
+                  <span
+                    key={skill}
+                    className="text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary"
+                  >
+                    {skill}
+                  </span>
+                ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No skills added</p>
+          )}
+        </div>
+
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h4 className="font-semibold text-foreground mb-2">Application Info</h4>
+          <p className="text-sm text-muted-foreground">
+            Status: {selectedApplicant.status}
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Applied At: {new Date(selectedApplicant.appliedAt).toLocaleString()}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-muted/40 p-4">
+          <h4 className="font-semibold text-foreground mb-2">Resume</h4>
+
+          {selectedApplicant.resumePath ? (
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm text-foreground">
+                  {selectedApplicant.resumeFileName || "Resume"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Resume uploaded
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleResumeDownload(selectedApplicant.resumePath)}
+                disabled={downloadingResume}
+                className="px-4 py-2 rounded-lg gradient-bg-primary text-primary-foreground text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
+              >
+                {downloadingResume ? "Opening..." : "View Resume"}
+              </button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No resume uploaded</p>
+          )}
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            onClick={() => setSelectedApplicant(null)}
+            className="border border-border text-foreground px-6 py-2.5 rounded-lg font-medium text-sm hover:bg-muted transition-colors"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       <Chatbot context="recruiter" />
     </motion.div>
   );
